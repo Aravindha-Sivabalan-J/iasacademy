@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COURSES</title>
+    <style>
+        .navbarmega{
+			display: grid;
+			background-color: khaki;
+			
+			grid-template-columns: auto auto auto;
+		}
+		.navbarmegaa{
+			color: whitesmoke;
+			background-color: darkkhaki;	
+			margin: 10px;
+			padding: 10px;
+			justify-content: center;
+		}
+        .navbarmegaa:hover{
+            background-color: rgb(242, 233, 155);
+        }
+        
+        
+        li{
+            list-style-type: none;
+        }
+        ul{
+            text-decoration: none;
+        }
+        a{
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div>
+        <form action="{% url 'back' %}" method="GET" style="display:inline;">
+            <button type="submit" class="back-button">Back</button>
+        </form>
+    </div>
+    <div class="navbarmega">
+        <ul>
+            {% for course in coursehome %}
+            <div class="navbarmegaa">
+            <a href = "{% url 'rooms' course.id %}"><h2>{{ course.subject }}</h2></a>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

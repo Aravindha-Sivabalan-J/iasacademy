@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum home</title>
+    <style>
+        .forum_container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px; /* optional: to add space between the columns */
+            padding: 20px; /* optional: for spacing around the grid */
+        }
+
+        .forum_content {
+            grid-column: 1; /* This ensures the main content goes into the 3fr section */
+        }
+
+        .participants {
+            grid-column: 2; /* This ensures the participants section goes into the 1fr section */
+        }
+
+        .forum_content div,
+        .participants div {
+            margin-bottom: 20px; /* optional: space between content sections */
+        }
+    </style>
+</head>
+<body>
+    <div class="forum_container">
+
+        <div class="forum_content">
+            <h1>{{ forum.name }}</h1>
+            <h5>Hosted By: @{{ forum.host }}</h5>
+            <h3>{{ forum.forum_desc }}</h3>
+            <form action="{% url 'back' %}" method="GET" style="display:inline;">
+                <button type="submit" class="back-button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; border: none;">Back</button>
+            </form>
+            <hr>      
+
+            <div>
+                <h3>MESSAGES</h3>
+                <hr>
+
+                {% for message in forum_messages %}
+                    {% if request.user == message.user %}
+                    <a href="{% url 'delmessages' message.id  %}">DELETE</a>  
+                    {% endif %}            
+                    <small>@{{ message.user }}   {{ message.created|timesince }}</small>
+                    <p>{{ message.body }}</p>
+                    <hr>
+                {% endfor %}
+            </div>
+
+            {% if request.user.is_authenticated %}
+            <form method="POST" action="">
+                {% csrf_token %}
+                <input type="text" name="body" placeholder="Type your message here...."/>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="participants">
+            <h3>PARTICIPANTS</h3>
+            <hr>
+            {% for user in participants %}
+                <div>
+                    {{ user.username }}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>  
+</body>
+</html>
+
+
+

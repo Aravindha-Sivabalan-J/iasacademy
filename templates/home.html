@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IASACADEMY</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+    
+        main {
+            margin: 20px;
+        }
+    
+        /* Navigation Bar */
+        .navbar ul {
+            display: flex;
+            justify-content: space-evenly;
+            list-style-type: none;
+            padding: 10px;
+            margin: 0;
+            background-color: #2e7d32; /* Deep green */
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .navbar a {
+            text-decoration: none;
+            color: white; /* White text for contrast */
+            font-weight: bold;
+            padding: 10px;
+            transition: all 0.3s ease-in-out;
+        }
+    
+        .navbar a:hover {
+            background-color: #81c784; /* Light green hover effect */
+            color: #1b5e20; /* Darker green text */
+            border-radius: 3px;
+        }
+    
+        /* Testimonial Section */
+        .testtext {
+            white-space: pre;
+            display: flex;
+            font-style: italic;
+            align-content: center;
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 7px;
+            text-align: center;
+            color: #ffffff;
+            background-color: #388e3c; /* Green background */
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Footer */
+        footer {
+            position: fixed; /* Stick to the bottom */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #c8e6c9; /* Light green */
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            color: #2e7d32; /* Deep green text */
+        }
+    
+        footer .martag {
+            display: inline-block;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+    
+        /* Course Links */
+        h5 {
+            margin: 15px 0;
+        }
+    
+        h5 a {
+            text-decoration: none;
+            color: #2e7d32; /* Green for links */
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
+        }
+    
+        h5 a:hover {
+            color: #1b5e20; /* Darker green for hover */
+        }
+    
+        /* Paragraph Styling */
+        p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+    
+        /* Marquee Content */
+        marquee {
+            color: #1b5e20; /* Dark green text */
+        }
+        .testimonial-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden; /* Hide overflowing text */
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-wrapper {
+            display: flex;
+            animation: scroll-left 20s linear infinite; /* Infinite scrolling */
+            padding-top: 50px;
+        }
+
+        .testimonial {
+            flex: 0 0 50%; /* Each testimonial takes full width */
+            margin: 0 50px; /* Add spacing between testimonials */
+            font-size: 18px;
+            color: #333;
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        .galcont{
+            width: auto;
+            margin-left: 0%;
+            margin-right: 0%;
+        }
+        
+    </style>
+    
+</head>
+<body>
+
+
+{% extends 'main.html' %}
+{% block content %}
+{% load static %}
+<div>
+    <nav class="navbar">
+        <ul>
+            <li><b><a href="{% url 'aboutus' %}">ABOUT US</a></b></li>
+            <li><b><a href="{% url 'contacthome' %}">CONTACT US</a></b></li>
+            <li><b><a href="{% url 'coursehome' %}">COURSES</a></b></li>
+            <li><b><a href="{% url 'forums' %}">FORUM</a></b></li>
+            <li><b><a href="{% url 'materials' %}">STUDY MATERIALS</a></b></li>
+            {% if request.user.is_authenticated %}
+            <li><b><a href="{% url 'logout' %}">LOGOUT</a></b></li>
+            {% else %}
+            <li><b><a href="{% url 'login' %}">LOGIN / SIGNUP</a></b></li>
+            {% endif %}
+
+        </ul>
+    </nav>
+</div>
+
+<main>
+<div style="height: 1500px;" >
+<p>Welcome to our IAS Academy, founded by Mr. ABCD, a dedicated and passionate individual who successfully cleared the prestigious UPSC Civil Services Examination in 2021. His journey from a determined aspirant to a successful civil servant has been one of perseverance, hard work, and resilience. Inspired by the challenges and rewards of the UPSC journey, Mr. ABCD decided to dedicate himself to helping future aspirants achieve their dreams of becoming civil servants.</p>
+
+<p>With firsthand experience of the rigorous demands of the UPSC exam, Mr. ABCD has created this academy with a mission to provide high-quality guidance and mentorship to aspiring candidates. His vision is to offer a structured approach to the preparation process, focusing on personalized attention, effective strategies, and comprehensive resources to ensure every student’s success. Through his academy, Mr. ABCD aims to empower the next generation of civil servants and guide them toward realizing their potential.</p>
+
+<h3>Our Journey of Excellence: Transforming Aspirations into Achievements</h3>
+
+<p>Over the past five years, our academy has been a guiding light for countless aspirants, helping them transform their dreams into reality. Our journey has been defined by relentless dedication, innovative teaching methods, and an unyielding commitment to student success. Here’s a closer look at our remarkable achievements:</p>
+
+<h3>Inspiring Success Stories</h3>
+
+<ul>
+    <li>350+ IAS Aspirants Cleared: Our specialized guidance and mentorship have paved the way for future leaders who now serve the nation with distinction and dedication.</li>
+    <li>500+ State PSC Selections: With focused training programs, we have prepared candidates to excel in state-level administrative exams, securing them prestigious roles in governance.</li>
+    <li>800+ Banking and SSC Achievers: Through structured courses and expert mentoring, we have enabled hundreds of students to land rewarding careers in banking and central services.</li>
+    <li>200+ Judicial Services Entrants: Our targeted support has helped legal minds break through competitive barriers and step into roles that uphold justice and fairness.</li>
+</ul>
+
+<h3>Building a Legacy of Excellence</h3>
+<p>Each number represents a story of resilience, determination, and the tireless efforts of our aspirants. But our impact goes beyond numbers. Our classrooms have become hubs of inspiration, fostering confidence, discipline, and a growth mindset among students.</p>
+
+<ul>
+    <li>
+        Enhanced Infrastructure: State-of-the-art classrooms, libraries, and digital tools have created an environment conducive to effective learning.
+    </li>
+    <li>
+        Expert Faculty: A team of seasoned mentors and subject matter experts ensures that our students are always a step ahead.
+    </li>
+    <li>
+        Comprehensive Resources: From curated study materials to mock tests and doubt-clearing sessions, we’ve left no stone unturned in preparing our students for success.
+    </li>
+</ul>
+
+    <br>
+    <div class="galcont">
+        <div class="gallery" style="background-color: #388e3c; padding-top: 10px; padding-bottom: 10px;">
+            <h2 style="text-align: center;">GALLERY</h2>
+        </div>
+        <div class="scroll-container">
+            <marquee behavior="scroll" direction="scroll-left" scrollamount="20">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/classimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/classsimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/classssimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/classsssimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/classssssimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/libimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/libbimg.jpg' %}">
+                <img  style="height: 400px; width: 400px;" src="{% static 'images/libbbimg.jpg' %}">
+            </marquee>       
+        </div>
+    </div>
+    <div>
+        {% for course in courses %}
+
+        <h5>{{ course.id }} ---- <a href = "{% url 'rooms' course.id %}">{{ course.subject }}</a></h5>
+
+        {% endfor %}
+    </div>
+    <br>
+
+<p>What truly sets us apart is the bond we share with our students—a bond built on trust, guidance, and mutual respect. We are proud to have been a part of their journey, cheering them on through challenges and celebrating their victories.</p>
+
+<div class="gallery" style="background-color: #388e3c; padding-top: 10px; padding-bottom: 10px; margin-left: 0%; margin-right: 0%;">
+    <h2 style="text-align: center;">TESTIMONIALS</h2>
+</div>
+    <div class="testimonial-container">
+        <div class="testimonial-wrapper">
+            <p class="testimonial"><b>"</b>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.This academy has truly transformed the way I approach my studies. The guidance is unmatched!<b>"</b></p>
+            <p class="testimonial">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.I owe my success to the incredible faculty and support system at the academy. Highly recommended!"</p>
+            <p class="testimonial">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Their materials and teaching strategies are world-class. This place is a gem for IAS aspirants."</p>
+            <p class="testimonial">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.The academy creates a positive and motivating learning environment. I loved every moment here!"</p>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+</main>
+
+
+<footer style="background-color: burlywood; color: brown;">
+    <marquee class="martag" behavior="scroll">CONTACT DETAILS: 976543210/9876543211  ADDRESS:No-1, ABCD street, XYZ Avenue, Chennai - 600001 </marquee>
+</footer>
+{% endblock content %}
+</html>

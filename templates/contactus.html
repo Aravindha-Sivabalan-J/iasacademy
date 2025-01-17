@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactus</title>
+    <style>
+        footer {
+            position: fixed; /* Make it stick to the bottom */
+            bottom: 0; /* Align it to the bottom */
+            left: 0; /* Align to the left */
+            width: 100%; /* Make it span the full width */
+            background-color: #f1f1f1; /* Background color */
+            text-align: center; /* Center text */
+            padding: 0; /* Padding for better spacing */
+            
+        }
+
+        /* Marquee content */
+        marquee {
+            display: inline-block;
+            white-space: nowrap;
+        }
+        h3{
+            font-family: sans-serif;
+            font-weight:100;
+        }
+    </style>
+</head>
+<body>
+
+    {% extends 'main.html' %}
+    {% block content %}
+
+    {% include 'contactnavbar.html' with contactus=contactus %}
+    
+
+        <h3>Feel free to walkin or contact us at your nearest branches!<br>Kickstart your competitive exam journey!</h3>
+
+        <h3><b>BRANCH NAME:</b><i>{{ contact.branch_name }}</i></h3>
+
+        <h3><b>ADDRESS:</b></h3>
+        <p><b>{{ contact.address_line1 }}</b></p>
+        <p><b>{{ contact.address_line2 }}</b></p>
+        <p><b>{{ contact.address_line3 }}</b></p>
+
+        <h3><b>CONTACT NUMBER:</b></h3>
+        <h4><b>WHATSAPP:</b></h4> <h4>{{ contact.contact_no }}</h4>
+        <h4><b>LANDLINE:</b></h4> <h4>{{ contact.landline_contact }}</h4>
+       
+
+
+    
+    
+        </body>
+        <footer>
+            <marquee behavior="scroll"><p> Follow us on social media to stay updated about course details and new batch announcements</p></marquee>
+        </footer>
+    {% endblock %}
+</html>

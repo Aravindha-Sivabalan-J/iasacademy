@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Forums</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+    
+        .forum_container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            margin: 20px auto;
+            max-width: 1000px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        h2, h3, h4 {
+            color: #2e7d32; /* Deep green shade for headings */
+        }
+    
+        h2 {
+            text-align: center;
+            background-color: #c8e6c9; /* Light green background */
+            padding: 15px;
+            border-radius: 5px;
+        }
+    
+        h3 {
+            margin-bottom: 10px;
+        }
+    
+        h4 {
+            margin: 10px 0;
+            font-weight: normal;
+        }
+    
+        p {
+            margin: 10px 0;
+        }
+    
+        a {
+            font-family: sans-serif;
+            text-decoration: none;
+            color: #2e7d32; /* Deep green for links */
+            font-weight: bold;
+        }
+    
+        a:hover {
+            text-decoration: underline;
+            color: #1b5e20; /* Darker green for hover effect */
+        }
+    
+        .forumdisplay:hover {
+            background-color: #e8f5e9; /* Very light green for hover effect */
+        }
+    
+        .forum_container div {
+            padding: 15px;
+            background-color: #f1f8e9; /* Soft green background for sections */
+            border-radius: 5px;
+        }
+    
+        .forum_container div:first-child {
+            background-color: #c8e6c9; /* Light green for the sidebar */
+        }
+    
+        .forum_container div a {
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    
+        .forum_container div a:last-child {
+            border-bottom: none;
+        }
+    
+        form {
+            margin: 20px 0;
+        }
+    
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #2e7d32; /* Deep green for buttons */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        button:hover {
+            background-color: #1b5e20; /* Darker green for hover */
+        }
+    
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    {% extends 'main.html' %}
+    {% block content %}
+
+    
+<div class="forum_container">
+
+    <div>
+        <h3>Browse Forums</h3>
+        <hr>
+
+        <div>
+            <a href="{% url 'forums' %}">All</a>
+        </div>
+        {% for topic in topics %}
+
+            <div>
+
+                <a href="{% url 'forums' %}?q={{ topic.name }}" >{{ topic.name }}</a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div>
+        <h2>WELCOME TO STUDENT FORUMS</h2>
+        {% if request.user.is_authenticated %}
+        <p>Hello {{ request.user }} !</p>
+        <a href="{% url 'logout' %}">LOGOUT</a>
+        {% else %}
+        <a href="{% url 'login' %}">LOGIN</a>
+        {% endif %}
+        
+        <h4>{{ forum_count }} Active Forums</h4>
+        <form method="GET" action="{% url 'forums' %}">
+            <input type="text" name="q" placeholder="Search Rooms" />
+        </form>
+        <a href="{% url 'createforum' %}">CREATE ROOM</a>
+        <form action="{% url 'back' %}" method="GET" style="display:inline;">
+            <button type="submit" class="back-button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; border: none;">Back</button>
+        </form>
+
+    
+
+        <div> 
+            {% for forum in forums %}
+            <h3>{{ forum.id }} -- <a href="{% url 'forumpage' forum.id %}">{{ forum.name }}</a></h3>
+            <h5><b>{{ forum.topic }}</b></h5>
+            <h5>Hosted By @{{ forum.host }}</h5>
+            {% if request.user == forum.host %}
+            <a href="{% url 'updateforum' pk=forum.id %}">EDIT FORUM</a>
+            <a href="{% url 'delforum' forum.id %}">DELETE FORUM</a>
+            {% endif %}
+            <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+    {% endblock content %}
+</body>
+</html>

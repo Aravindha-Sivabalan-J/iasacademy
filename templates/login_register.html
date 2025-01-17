@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIN/REGISTER</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #a8ff78, #78ffd6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        .container label {
+            display: block;
+            margin: 10px 0 5px;
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+        .container input[type="text"],
+        .container input[type="password"],
+        .container input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .container input[type="submit"] {
+            background: #78ffd6;
+            color: #333;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .container input[type="submit"]:hover {
+            background: #a8ff78;
+        }
+        .container p {
+            font-size: 14px;
+            color: #555;
+        }
+        .container a {
+            color: #78ffd6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    {% extends 'main.html' %}
+    {% block content %}
+    {% if page == 'login' %}
+    <div>
+        <form method="POST" action="">
+        {% csrf_token %}
+
+            <label>USERNAME:</label>
+            <input type="text" name="username" placeholder="Enter Username">
+
+            <label>PASSWORD:</label>
+            <input type="password" name="password" placeholder="Enter Password">
+
+            <input type="submit" value="LOGIN">
+        </form>
+        <p>Haven't signed up yet?</p>
+        <a href="{% url 'register' %}">SIGN UP</a>
+    </div>
+    {% else %}
+    <div>
+        <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p }}    
+        <input type="submit" value="REGISTER">
+        </form>
+        <p>Already signed up? Lets log you in!</p>
+        <a href="{% url 'login' %}">LOGIN</a>
+    </div>
+    {% endif %}
+
+    {% endblock content %}
+</body>
+</html>

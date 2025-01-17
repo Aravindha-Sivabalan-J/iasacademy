@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .navbar ul{
+            display: flex;
+            justify-content: space-evenly;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            background-color: darkkhaki;
+            overflow: hidden;
+        }
+        .navbar a{
+            color: black;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+        }
+        .navbar a:hover{
+            background-color: rgb(242, 233, 155);
+            color: brown
+        }
+        .navbar li{
+            float: left;
+        }
+        li{
+            font-family: sans-serif;
+            
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <nav class="navbar">
+            <ul>
+                {% for contact in contactus %}
+    
+                <li><a href = "{% url 'contacts' contact.id %}">{{ contact.branch_name }}</a></li>
+    
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+    </body>
+</body>
+</html>

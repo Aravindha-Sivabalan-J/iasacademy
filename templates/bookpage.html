@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Product</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9; /* Light background */
+            color: #333;
+        }
+    
+        /* Container for the Page */
+        .bookpages {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap; /* Makes it responsive */
+        }
+    
+        /* Book Image Styling */
+        .bookpages img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+    
+        /* Book Information Section */
+        .bookinfo {
+            max-width: 500px;
+            padding: 10px 15px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .bookinfo h3 {
+            font-size: 20px;
+            color: #2e7d32; /* Green for headings */
+            margin-bottom: 5px;
+        }
+    
+        .bookinfo p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+    
+        /* Buttons Styling */
+        .btncls {
+            background-color: #2e7d32; /* Green theme */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+    
+        .btncls:hover {
+            background-color: #81c784; /* Light green hover */
+            color: black;
+        }
+    
+        /* Add to Cart Button */
+        .btn-primary {
+            text-decoration: none;
+        }
+    
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .bookpages {
+                flex-direction: column;
+                align-items: center;
+            }
+    
+            .bookinfo {
+                width: 100%;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="bookpages">
+        <div>
+            
+            <img style="height:600px; width: 500px;"     src="{{ product.product_img.url }}">
+        </div>
+        <div class="bookinfo">
+            <h3>BOOK NAME:</h3>
+            <p>{{ product.name }}</p>
+            <h3>ABOUT THE BOOK:</h3>
+            <p>{{ product.description }}</p>
+            <h3>PRICE:</h3>
+            <p>&#8377;.{{ product.price|floatformat:2 }}/-</p>
+
+            <a><button class="btncls" style="border-radius: 5px; padding: 10px;"><b>BUY NOW</b></button></a>
+            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary"><button class="btncls" style="border-radius: 5px; padding: 10px;">ADD TO CART</button></a>
+            
+        </div>
+    </div>
+</body>
+</html>

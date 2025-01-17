@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #004aad;
+            margin: 20px 0;
+        }
+
+        h3 {
+            color: #0056b3;
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 10px 0 20px 0;
+            line-height: 1.5;
+        }
+
+        /* Underline for section titles */
+        h3 u {
+            text-decoration: none;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 3px;
+        }
+
+        /* Highlighting course cost */
+        p b {
+            color: #d9534f;
+        }
+
+        /* Page container */
+        .content-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Adjust link styles */
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>{{ course.subject }}</h1>
+
+<h3><u>ABOUT THE COURSE</u></h3>
+<p>{{ course.description }}</p>
+
+<h3><u>COURSE DURATION</u></h3>
+<p>The course is tailored for a period of about <b>{{ course.duration }}</b></p>
+
+<h3><u>NO OF TESTS</u></h3>
+<p>Preparation is key for any Competitive exam, hence the academy conducts a set of tailormade <b>{{ course.no_of_tests }} tests</b> to prepare you for the exam</p>
+
+<h3><u>STUDY MATERIAL</u></h3>
+<p>{{ course.study_material }}</p>
+
+<h3><u>COURSE COST</u></h3>
+<P>The {{ course.subject }} course is now available at Rs.{{ course.price }}/-</P>
+
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFO PAGE</title>
+    <style>
+        .navbarmega{
+			display: grid;
+			background-color: khaki;
+			
+			grid-template-columns: auto auto auto;
+		}
+		.navbarmegaa{
+			color: whitesmoke;
+			background-color: darkkhaki;	
+			margin: 10px;
+			padding: 10px;
+			justify-content: center;
+		}
+        .navbarmegaa:hover{
+            background-color: rgb(242, 233, 155);
+        }
+        
+        
+        li{
+            list-style-type: none;
+        }
+        ul{
+            text-decoration: none;
+        }
+        a{
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+
+<body>
+    <form action="{% url 'back' %}" method="GET" style="display:inline;">
+        <button type="submit" class="back-button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; border: none;">Back</button>
+    </form>
+    <div class="navbarmega">
+        <ul>
+            {% for contact in contacthome %}
+        <div class="navbarmegaa">
+            <h2><a href = "{% url 'contacts' contact.id %}">{{ contact.branch_name }}</a></h2>
+        </div>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
