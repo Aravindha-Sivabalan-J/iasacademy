@@ -9,8 +9,8 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Courses, Product
 from .models import Contactus
 from .models import Forums
-from .models import Topic, Message, Cart
-from .forms import ForumForm, ProductForm
+from .models import Topic, Message, Cart, Order
+from .forms import ForumForm, ProductForm, OrderForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
 
@@ -291,59 +291,7 @@ def cart(request):
     return render(request, 'cart.html', context)
 
 
-def checkout(request):
-    
-    cart_items = Cart.objects.filter(user=request.user)
 
-    
-    if not cart_items:
-        messages.info(request, "Your cart is empty. Please add items to the cart before checking out.")
-        return redirect('materials')
-
-    
-    total_price = 0
-    items_with_totals = []
-    for item in cart_items:
-        item_total = item.product.price * item.quantity
-        total_price += item_total
-        items_with_totals.append({
-            'product': item.product,
-            'quantity': item.quantity,
-            'item_total': item_total
-        })
-
-    if request.method == 'POST':# Capture shipping information and other details from the form
-        shipping_address = request.POST.get('shipping_address')
-        phone_number = request.POST.get('phone_number')
-        payment_method = request.POST.get('payment_method')
-
-        if not shipping_address or not phone_number or not payment_method:
-            messages.error(request, "Please fill in all the details.")
-            return redirect('checkout')
-
-        
-        order = Order.objects.create(
-            user=request.user,
-            shipping_address=shipping_address,
-            phone_number=phone_number,
-            total_price=total_price,
-            payment_method=payment_method,
-            status='Pending'
-        )
-
-        for cart_item in cart_items:
-            order.items.add(cart_item)
-
-        
-        cart_items.delete()
-        messages.success(request, f"Your order has been placed successfully! Order ID: {order.id}")
-        return redirect('order_confirmation', order_id=order.id)
-
-    
-    return render(request, 'checkout.html', {
-        'cart_items': items_with_totals,
-        'total_price': total_price
-    })
 
 def back_view(request):
     
@@ -360,3 +308,71 @@ def back_view(request):
         return HttpResponseRedirect(history[-1])
 
     return HttpResponseRedirect('/')
+def checkout(request): 
+    cart_items = Cart.objects.filter(user=request.user)
+    if not cart_items:
+        messages.info(request, "Your cart is empty. Please add items to the cart before checking out.")
+        return redirect('materials')
+    total_price = 0
+    items_with_totals = []
+    for item in cart_items:
+        item_total = item.product.price * item.quantity
+        total_price += item_total
+        items_with_totals.append({
+            'product': item.product,
+            'quantity': item.quantity,
+            'item_total': item_total
+        })
+    if request.method == 'POST':# Capture shipping information and other details from the form
+        shipping_address = request.POST.get('shipping_address')
+        phone_number = request.POST.get('phone_number')
+        payment_method = request.POST.get('payment_method')
+
+        if not shipping_address or not phone_number or not payment_method:
+            messages.error(request, "Please fill in all the details.")
+            return redirect('checkout')
+        order = Order.objects.create(
+            user=request.user,
+            shipping_address=shipping_address,
+            phone_number=phone_number,
+            total_price=total_price,
+            payment_method=payment_method,
+            status='Pending'
+        )
+        for cart_item in cart_items:
+            order.items.add(cart_item)
+        cart_items.delete()
+        messages.success(request, f"Your order has been placed successfully! Order ID: {order.id}")
+        return redirect('order_confirmation', order_id=order.id)
+    return render(request, 'checkout.html', {
+        'cart_items': items_with_totals,
+        'total_price': total_price
+    })
+
+
+@login_required(login_url='login')
+def place_an_order(request):
+    checkoutform = OrderForm()
+    
+    cart_items = Cart.objects.filter(user=request.user)
+    if not cart_items.exists():
+        return render(request, 'error_page.html', {'message': 'Your cart is empty.'})
+
+    if request.method == 'POST':
+        checkoutform = OrderForm(request.POST)
+        if checkoutform.is_valid():
+            order = checkoutform.save(commit=False)
+            
+            order.user = request.user
+            
+            order.save()
+            
+            order.items.set(cart_items)  
+            
+            cart_items.delete()
+
+            return redirect('materials') 
+
+    context = {'checkoutform': checkoutform}
+    return render(request, 'place_order.html', context)
+

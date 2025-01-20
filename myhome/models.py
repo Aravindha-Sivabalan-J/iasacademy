@@ -87,11 +87,18 @@ class Cart(models.Model):
         return f"{self.product.name} - {self.quantity} items"
 
 class Order(models.Model):
+    payment_method_options = [
+        ('COD', 'Cash on Delivery'),
+        ('CARD', 'Credit/Debit Card'),
+        ('UPI', 'UPI Apps'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    shipping_address = models.CharField(max_length=255)
+    Address_line_1 = models.CharField(max_length=255)
+    Address_line_2 = models.CharField(max_length=255, blank='True', null='True')
+    Address_line_3 = models.CharField(max_length=255, blank='True', null='True')
+    Zipcode = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
-    payment_method = models.CharField(max_length=20)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(choices=payment_method_options, max_length=50, default='COD')
     status = models.CharField(max_length=20, default='Pending')
-    items = models.ManyToManyField(Cart)  # This will link to the cart items
+    items = models.ManyToManyField(Cart) 
 

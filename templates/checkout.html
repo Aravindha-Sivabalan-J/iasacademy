@@ -135,33 +135,9 @@
 <p><strong>Total Price: {{ total_price }}</strong></p>
 
 
-<form method="POST">
-    {% csrf_token %}
-    <h3>Shipping Information</h3>
-    <p><label for="address_line_1">Address Line 1:</label>
-    <input type="text" name="address_line_1" required></p>
-	
-    <p><label for="address_line_2">Address Line 2:</label>
-    <input type="text" name="address_line_2" required></p>
-    
-    <p><label for="address_line_3">Address Line 3:</label>
-    <input type="text" name="address_line_3" required></p>
 
-    <p><label for="zipcode">Zipcode</label>
-    <input type="text" name="zipcode" required></p>
+    <button><a href = "{% url 'place_order' %}">Place Order</a></a></button>
 
-    <p><label for="phone_number">Phone Number:</label>
-    <input type="text" name="phone_number" required></p>
-
-    <p><label for="payment_method">Payment Method:</label>
-    <select name="payment_method">
-        <option value="UPI">UPI</option>
-        <option value="Card">Card</option>
-        <option value="Cash on Delivery">Cash on Delivery</option>
-    </select></p>
-
-    <button type="submit">Place Order</button>
-</form>
 
 
 {% endblock %}

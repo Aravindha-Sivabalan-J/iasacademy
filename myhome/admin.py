@@ -8,6 +8,7 @@ from .models import Forums
 from .models import Message
 from .models import Topic
 from .models import Product
+from .models import Order
 
 admin.site.register(Courses)
 admin.site.register(Contactus)
@@ -15,3 +16,4 @@ admin.site.register(Forums)
 admin.site.register(Message)
 admin.site.register(Topic)
 admin.site.register(Product)
+admin.site.register(Order)
