@@ -267,16 +267,16 @@ def update_cart(request, cart_item_id, action):
     elif action == 'decrease' and cart_item.quantity > 1:
         cart_item.quantity -= 1
     elif action == 'decrease' and cart_item.quantity == 1:
-        cart_item.delete()  # Remove the item from the cart if the quantity reaches 0
+        cart_item.delete()
         messages.info(request, f"{cart_item.product.name} was removed from your cart.")
-        return redirect('cart')  # Redirect to the cart page without crashing
+        return redirect('cart')  
 
     cart_item.save()
     return redirect('cart')
 
 @login_required(login_url='login')
 def cart(request):
-    # Get cart items for the logged-in user
+    
     cart_items = Cart.objects.filter(user=request.user)
 
     total_price = 0
@@ -292,15 +292,15 @@ def cart(request):
 
 
 def checkout(request):
-    # Retrieve the cart items for the current user
+    
     cart_items = Cart.objects.filter(user=request.user)
 
-    # If the cart is empty, redirect to the materials page
+    
     if not cart_items:
         messages.info(request, "Your cart is empty. Please add items to the cart before checking out.")
         return redirect('materials')
 
-    # Calculate total price and prepare cart items with total for each
+    
     total_price = 0
     items_with_totals = []
     for item in cart_items:
@@ -312,9 +312,7 @@ def checkout(request):
             'item_total': item_total
         })
 
-    # If the form is submitted (POST request), process the order
-    if request.method == 'POST':
-        # Capture shipping information and other details from the form
+    if request.method == 'POST':# Capture shipping information and other details from the form
         shipping_address = request.POST.get('shipping_address')
         phone_number = request.POST.get('phone_number')
         payment_method = request.POST.get('payment_method')
@@ -323,7 +321,7 @@ def checkout(request):
             messages.error(request, "Please fill in all the details.")
             return redirect('checkout')
 
-        # Create an order
+        
         order = Order.objects.create(
             user=request.user,
             shipping_address=shipping_address,
@@ -333,40 +331,32 @@ def checkout(request):
             status='Pending'
         )
 
-        # Add cart items to the order
         for cart_item in cart_items:
             order.items.add(cart_item)
 
-        # Clear the cart
+        
         cart_items.delete()
-
-        # Redirect to the order confirmation page
         messages.success(request, f"Your order has been placed successfully! Order ID: {order.id}")
         return redirect('order_confirmation', order_id=order.id)
 
-    # Pass the calculated items and total price to the template
+    
     return render(request, 'checkout.html', {
         'cart_items': items_with_totals,
         'total_price': total_price
     })
 
 def back_view(request):
-    # Retrieve session history (list of visited URLs)
+    
     history = request.session.get('history', [])
 
-    # Debugging log for session history
+    
     print(f"History before back button: {history}")
 
-    # Ensure we have at least two pages in history (current page + at least one previous)
     if len(history) > 1:
-        # Pop the current page off the history stack
         history.pop()
 
-        # Update the session with the modified history
         request.session['history'] = history
 
-        # Redirect to the previous page (the new last item in history)
         return HttpResponseRedirect(history[-1])
 
-    # Fallback to home page if there's no valid history
     return HttpResponseRedirect('/')
