@@ -59,6 +59,7 @@ class Message(models.Model):
     def __str__(self):
         return self.body[0:50]
 
+
 class Product(models.Model):
     product_type_choices = [
         ('book', 'Book'),
@@ -80,8 +81,17 @@ class Product(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        # Return a summary of all items in the cart (for better clarity)
+        items = ", ".join([f"{item.product.name} (x{item.quantity})" for item in self.items.all()])
+        return f"Cart for {self.user.username}: {items}"
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)  # Prevent product deletion affecting orders
     quantity = models.PositiveIntegerField(default=1)
+    
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity} items"
@@ -96,9 +106,27 @@ class Order(models.Model):
     Address_line_1 = models.CharField(max_length=255)
     Address_line_2 = models.CharField(max_length=255, blank='True', null='True')
     Address_line_3 = models.CharField(max_length=255, blank='True', null='True')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     Zipcode = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
     payment_method = models.CharField(choices=payment_method_options, max_length=50, default='COD')
     status = models.CharField(max_length=20, default='Pending')
-    items = models.ManyToManyField(Cart) 
+    items = models.ManyToManyField(CartItem, related_name="orders") 
+
+    def __str__(self):
+        return f"Order {self.id} by {self.user.username}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+
+
+
+    
+
+
 

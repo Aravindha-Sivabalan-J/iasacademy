@@ -134,9 +134,17 @@
 
 <p><strong>Total Price: {{ total_price }}</strong></p>
 
+<div>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ checkoutform.as_p }}
+        <input type="submit" value="SUBMIT"/>
+    </form>
+</div>
 
 
-    <button><a href = "{% url 'place_order' %}">Place Order</a></a></button>
+
+    
 
 
 

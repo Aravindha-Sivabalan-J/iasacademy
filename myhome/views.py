@@ -9,10 +9,11 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Courses, Product
 from .models import Contactus
 from .models import Forums
-from .models import Topic, Message, Cart, Order
+from .models import Topic, Message, Cart, Order, CartItem, OrderItem
 from .forms import ForumForm, ProductForm, OrderForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -236,22 +237,36 @@ def delmessages(request,pk):
 
 @login_required(login_url='login')
 def add_to_cart(request, product_id):
-    product = Product.objects.get(id=product_id)
-    cart_item, created = Cart.objects.get_or_create(
-        user=request.user,
+    # Fetch the product
+    product = get_object_or_404(Product, id=product_id)
+
+    # Get or create the cart for the user
+    user_cart, created = Cart.objects.get_or_create(user=request.user)
+
+    # Check if the product is already in the cart
+    cart_item, created = CartItem.objects.get_or_create(
+        cart=user_cart,
         product=product,
         defaults={'quantity': 1}
     )
+
+    # If the item already exists in the cart, increase its quantity
     if not created:
         cart_item.quantity += 1
         cart_item.save()
+
     messages.success(request, f"{product.name} has been added to your cart.")
     return redirect('cart')
 
 @login_required(login_url='login')
 def view_cart(request):
-    cart_items = Cart.objects.filter(user=request.user)
+    # Fetch the user's cart
+    user_cart = get_object_or_404(Cart, user=request.user)
+    cart_items = CartItem.objects.filter(cart=user_cart)
+
+    # Calculate the total price of items in the cart
     total_price = sum(item.product.price * item.quantity for item in cart_items)
+
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
@@ -260,35 +275,37 @@ def view_cart(request):
 
 @login_required(login_url='login')
 def update_cart(request, cart_item_id, action):
-    cart_item = Cart.objects.get(id=cart_item_id, user=request.user)
-    
+    # Fetch the cart item for the logged-in user
+    cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+
     if action == 'increase':
         cart_item.quantity += 1
-    elif action == 'decrease' and cart_item.quantity > 1:
-        cart_item.quantity -= 1
-    elif action == 'decrease' and cart_item.quantity == 1:
-        cart_item.delete()
-        messages.info(request, f"{cart_item.product.name} was removed from your cart.")
-        return redirect('cart')  
+    elif action == 'decrease':
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+        else:
+            cart_item.delete()  # Remove the item if the quantity is reduced to zero
+            messages.info(request, f"{cart_item.product.name} was removed from your cart.")
+            return redirect('cart')
 
     cart_item.save()
     return redirect('cart')
 
 @login_required(login_url='login')
 def cart(request):
-    
-    cart_items = Cart.objects.filter(user=request.user)
+    # Fetch the user's cart
+    user_cart = get_object_or_404(Cart, user=request.user)
+    cart_items = CartItem.objects.filter(cart=user_cart)
 
-    total_price = 0
-    for item in cart_items:
-        total_price += item.product.price * item.quantity
+    # Calculate the total price
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
 
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
     }
-
     return render(request, 'cart.html', context)
+
 
 
 
@@ -308,11 +325,19 @@ def back_view(request):
         return HttpResponseRedirect(history[-1])
 
     return HttpResponseRedirect('/')
-def checkout(request): 
-    cart_items = Cart.objects.filter(user=request.user)
-    if not cart_items:
+
+
+def checkout(request):
+    # Fetch the cart for the logged-in user
+    user_cart = get_object_or_404(Cart, user=request.user)
+    cart_items = CartItem.objects.filter(cart=user_cart)
+
+    # Check if the cart is empty
+    if not cart_items.exists():
         messages.info(request, "Your cart is empty. Please add items to the cart before checking out.")
         return redirect('materials')
+
+    # Calculate total price and prepare item details
     total_price = 0
     items_with_totals = []
     for item in cart_items:
@@ -321,58 +346,44 @@ def checkout(request):
         items_with_totals.append({
             'product': item.product,
             'quantity': item.quantity,
-            'item_total': item_total
+            'item_total': item_total,
         })
-    if request.method == 'POST':# Capture shipping information and other details from the form
-        shipping_address = request.POST.get('shipping_address')
-        phone_number = request.POST.get('phone_number')
-        payment_method = request.POST.get('payment_method')
 
-        if not shipping_address or not phone_number or not payment_method:
-            messages.error(request, "Please fill in all the details.")
-            return redirect('checkout')
-        order = Order.objects.create(
-            user=request.user,
-            shipping_address=shipping_address,
-            phone_number=phone_number,
-            total_price=total_price,
-            payment_method=payment_method,
-            status='Pending'
-        )
-        for cart_item in cart_items:
-            order.items.add(cart_item)
-        cart_items.delete()
-        messages.success(request, f"Your order has been placed successfully! Order ID: {order.id}")
-        return redirect('order_confirmation', order_id=order.id)
-    return render(request, 'checkout.html', {
-        'cart_items': items_with_totals,
-        'total_price': total_price
-    })
-
-
-@login_required(login_url='login')
-def place_an_order(request):
-    checkoutform = OrderForm()
-    
-    cart_items = Cart.objects.filter(user=request.user)
-    if not cart_items.exists():
-        return render(request, 'error_page.html', {'message': 'Your cart is empty.'})
-
+    # Handle the POST request (form submission)
     if request.method == 'POST':
         checkoutform = OrderForm(request.POST)
+
         if checkoutform.is_valid():
+            # Capture shipping information and other details from the form
             order = checkoutform.save(commit=False)
-            
             order.user = request.user
-            
+            order.total_amount = total_price
+            order.status = 'Pending'  # You can set the order status to "Pending"
             order.save()
-            
-            order.items.set(cart_items)  
-            
+
+            # Create OrderItem instances for each CartItem
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    quantity=cart_item.quantity,
+                    price=cart_item.product.price
+                )
+
+            # Clear the cart after placing the order
             cart_items.delete()
 
-            return redirect('materials') 
+            messages.success(request, f"Your order has been placed successfully! Order ID: {order.id}")
+            return redirect('materials')  # Redirect to order confirmation page (optional)
 
-    context = {'checkoutform': checkoutform}
-    return render(request, 'place_order.html', context)
+    else:
+        # Handle the GET request (initial empty form)
+        checkoutform = OrderForm()
+
+    # Render the checkout page with form and order details
+    return render(request, 'checkout.html', {
+        'checkoutform': checkoutform,
+        'cart_items': items_with_totals,
+        'total_price': total_price,
+    })
 
