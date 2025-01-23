@@ -21,7 +21,6 @@ def loginpage(request):
     page='login'
     if request.user.is_authenticated:
         return redirect('home')
-
     if request.method=='POST':
         username=request.POST.get('username').lower()
         password=request.POST.get('password')
@@ -31,14 +30,11 @@ def loginpage(request):
         #     messages.error(request, 'User does not exist')
 
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             login(request, user)
             return redirect('home')
         else:
             messages.error(request, 'User does not Exist')
-
-
     context={'page':page}
     return render(request, 'login_register.html', context)
 
@@ -47,7 +43,6 @@ def logoutuser(request):
     return redirect('home')
 
 def registeruser(request):
-    
     form=UserCreationForm()
     if request.method == 'POST':
         form=UserCreationForm(request.POST)
@@ -134,7 +129,6 @@ def bookpage(request, product_id):
         product = Product.objects.get(id=product_id)
     except Product.DoesNotExist:
         raise Http404("Product not found")
-    
     return render(request, 'bookpage.html', {'product': product})
 
 def forums(request):
@@ -151,12 +145,8 @@ def forums(request):
 
 def register(request):
     if request.method == 'POST':
-        
         user = User.objects.create_user(username='new_user', password='new_password')
-        
-        
         customer = Customer.objects.create(user=user)
-
         return redirect('home')
 
 @login_required(login_url='login')
@@ -173,7 +163,6 @@ def Forumpage(request,pk):
         )
         forum.participants.add(request.user)
         return redirect ('forumpage', pk=forum.id)
-
     context={'forum':forum, 'forum_messages':forum_messages, 'participants':participants}
     return render (request, 'forumpage.html', context)
 
@@ -193,7 +182,6 @@ def createforum(request):
             forum.host=request.user
             forum.save()
             return redirect('forums')
-
     context={'form':form}
     return render (request,'room_form.html', context)
 
@@ -201,10 +189,8 @@ def createforum(request):
 def updateforum(request,pk):
     forum=Forums.objects.get(id=pk)
     form= ForumForm(instance=forum)
-
     if request.user != forum.host:
         return HttpResponse('Action Not Allowed!')
-
     if request.method=='POST':
         form=ForumForm(request.POST, instance=forum)
         if form.is_valid():
@@ -218,7 +204,6 @@ def delforum(request,pk):
     forum=Forums.objects.get(id=pk)
     if request.user != forum.host:
         return HttpResponse('Action Not Allowed!')
-
     if request.method=='POST':
         forum.delete()
         return redirect('forums')
@@ -254,19 +239,14 @@ def add_to_cart(request, product_id):
     if not created:
         cart_item.quantity += 1
         cart_item.save()
-
     messages.success(request, f"{product.name} has been added to your cart.")
     return redirect('cart')
 
 @login_required(login_url='login')
 def view_cart(request):
-    
     user_cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=user_cart)
-
-   
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
@@ -275,9 +255,7 @@ def view_cart(request):
 
 @login_required(login_url='login')
 def update_cart(request, cart_item_id, action):
-    
     cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
-
     if action == 'increase':
         cart_item.quantity += 1
     elif action == 'decrease':
@@ -287,42 +265,27 @@ def update_cart(request, cart_item_id, action):
             cart_item.delete()  
             messages.info(request, f"{cart_item.product.name} was removed from your cart.")
             return redirect('cart')
-
     cart_item.save()
     return redirect('cart')
 
 @login_required(login_url='login')
 def cart(request):
-    
     user_cart = get_object_or_404(Cart, user=request.user)
-    cart_items = CartItem.objects.filter(cart=user_cart)
-
-    
+    cart_items = CartItem.objects.filter(cart=user_cart) 
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
     }
     return render(request, 'cart.html', context)
 
-
-
-
-
-def back_view(request):
-    
+def back_view(request): 
     history = request.session.get('history', [])
-
     print(f"History before back button: {history}")
-
     if len(history) > 1:
         history.pop()
-
         request.session['history'] = history
-
         return HttpResponseRedirect(history[-1])
-
     return HttpResponseRedirect('/')
 
 
