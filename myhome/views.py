@@ -151,10 +151,10 @@ def forums(request):
 
 def register(request):
     if request.method == 'POST':
-        # handle user registration here
+        
         user = User.objects.create_user(username='new_user', password='new_password')
         
-        # Now, create a corresponding Customer object
+        
         customer = Customer.objects.create(user=user)
 
         return redirect('home')
@@ -260,11 +260,11 @@ def add_to_cart(request, product_id):
 
 @login_required(login_url='login')
 def view_cart(request):
-    # Fetch the user's cart
+    
     user_cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=user_cart)
 
-    # Calculate the total price of items in the cart
+   
     total_price = sum(item.product.price * item.quantity for item in cart_items)
 
     context = {
@@ -275,7 +275,7 @@ def view_cart(request):
 
 @login_required(login_url='login')
 def update_cart(request, cart_item_id, action):
-    # Fetch the cart item for the logged-in user
+    
     cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
 
     if action == 'increase':
@@ -284,7 +284,7 @@ def update_cart(request, cart_item_id, action):
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
         else:
-            cart_item.delete()  # Remove the item if the quantity is reduced to zero
+            cart_item.delete()  
             messages.info(request, f"{cart_item.product.name} was removed from your cart.")
             return redirect('cart')
 
@@ -293,11 +293,11 @@ def update_cart(request, cart_item_id, action):
 
 @login_required(login_url='login')
 def cart(request):
-    # Fetch the user's cart
+    
     user_cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=user_cart)
 
-    # Calculate the total price
+    
     total_price = sum(item.product.price * item.quantity for item in cart_items)
 
     context = {
@@ -314,7 +314,6 @@ def back_view(request):
     
     history = request.session.get('history', [])
 
-    
     print(f"History before back button: {history}")
 
     if len(history) > 1:
