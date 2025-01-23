@@ -10,7 +10,7 @@ from .models import Courses, Product
 from .models import Contactus
 from .models import Forums
 from .models import Topic, Message, Cart, Order, CartItem, OrderItem
-from .forms import ForumForm, ProductForm, OrderForm
+from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -122,6 +122,18 @@ def add_product(request):
             return redirect ('materials')
     context={'bookform':bookform}
     return render (request,'bookform.html', context)
+
+@user_passes_test(is_superuser_or_staff, login_url='login')
+def add_course(request):
+    courseform = AddcourseForm()
+    if request.method == 'POST':
+        courseform = AddcourseForm(request.POST)
+        if courseform.is_valid():
+            courses = courseform.save(commit='TRUE')
+            courses.save()
+            return redirect ('coursehome')
+    context={'courseform':courseform}
+    return render (request, 'courseform.html', context)
 
 
 def bookpage(request, product_id):

@@ -82,19 +82,27 @@
         }
     
         /* Course Links */
-        h5 {
+        a{
+            text-decoration: none;
+        }
+        h2 {
             margin: 15px 0;
+            text-decoration-style: none;
+            background-color: #2e7d32;
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
     
-        h5 a {
+        a h2 {
+            text-align: center;
             text-decoration: none;
-            color: #2e7d32; /* Green for links */
+            color: black; /* Green for links */
             font-weight: bold;
             transition: color 0.3s ease-in-out;
         }
     
-        h5 a:hover {
-            color: #1b5e20; /* Darker green for hover */
+        a h2:hover {
+            color: white; /* Darker green for hover */
         }
     
         /* Paragraph Styling */
@@ -225,10 +233,12 @@
             </marquee>       
         </div>
     </div>
-    <div>
+
+
+    <div class="coursediv">
         {% for course in courses %}
 
-        <h5>{{ course.id }} ---- <a href = "{% url 'rooms' course.id %}">{{ course.subject }}</a></h5>
+        <a href = "{% url 'rooms' course.id %}"><h2>{{ course.subject }}</h2></a>
 
         {% endfor %}
     </div>

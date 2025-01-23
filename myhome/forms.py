@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Forums, Product, Order
+from .models import Forums, Product, Order, Courses
 
 class ForumForm(ModelForm):
     class Meta:
@@ -16,4 +16,9 @@ class OrderForm(ModelForm):
     class Meta:
         model = Order
         fields = '__all__'
-        exclude = ['status', 'items', 'user', 'total_amount'] 
+        exclude = ['status', 'items', 'user', 'total_amount']
+
+class AddcourseForm(ModelForm):
+    class Meta:
+        model = Courses
+        fields = '__all__'

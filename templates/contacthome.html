@@ -44,7 +44,7 @@
         <ul>
             {% for contact in contacthome %}
         <div class="navbarmegaa">
-            <h2><a href = "{% url 'contacts' contact.id %}">{{ contact.branch_name }}</a></h2>
+            <a href = "{% url 'contacts' contact.id %}"><h2>{{ contact.branch_name }}</h2></a>
         </div>
             {% endfor %}
         </ul>

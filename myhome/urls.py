@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('rooms/<str:pk>', views.rooms, name="rooms"),
     path('coursehome/', views.coursehome, name="coursehome"),
+    path('addcourse/', views.add_course, name="addcourse"),
     path('contacthome/', views.contacthome, name="contacthome"),
     path('contactus/<str:pk>', views.contactus, name="contacts"),
     path('materials/', views.materials_page, name="materials"),
