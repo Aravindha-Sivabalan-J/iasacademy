@@ -157,7 +157,7 @@
         
         <h4>{{ forum_count }} Active Forums</h4>
         <form method="GET" action="{% url 'forums' %}">
-            <input type="text" name="q" placeholder="Search Rooms" />
+            <input type="text" name="q" placeholder="Search inside Rooms" />
         </form>
 
         {% if request.user.is_authenticated and request.user.is_superuser %}
