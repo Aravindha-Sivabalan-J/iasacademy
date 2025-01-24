@@ -7,7 +7,7 @@
     <style>
         .navbarmega{
 			display: grid;
-			background-color: khaki;
+			background-color: darkgoldenrod;
 			
 			grid-template-columns: auto auto auto;
 		}
@@ -49,5 +49,8 @@
             {% endfor %}
         </ul>
     </div>
+        {% if request.user.is_authenticated and request.user.is_superuser %}
+            <button style="padding: 10px; background-color: #4CAF50; border-radius: 7px;"><a href="{% url 'addcontact' %}" style="color: white;">ADD A CONTACT</a></button>
+        {% endif %}
 </body>
 </html>

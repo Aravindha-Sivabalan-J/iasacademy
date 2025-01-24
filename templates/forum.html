@@ -57,7 +57,7 @@
         }
     
         a:hover {
-            text-decoration: underline;
+            text-decoration: solid;
             color: #1b5e20; /* Darker green for hover effect */
         }
     
@@ -154,6 +154,10 @@
         {% else %}
         <a href="{% url 'login' %}">LOGIN</a>
         {% endif %}
+
+        {% if request.user.is_authenticated and request.user.is_superuser %}
+        <a href="{% url 'addtopic' %}">ADD (or) DELETE A TOPIC</a>
+        {% endif %}
         
         <h4>{{ forum_count }} Active Forums</h4>
         <form method="GET" action="{% url 'forums' %}">
@@ -161,7 +165,9 @@
         </form>
 
         {% if request.user.is_authenticated and request.user.is_superuser %}
+        
         <a href="{% url 'createforum' %}">CREATE ROOM</a>
+        
         {% endif %}
         
         <form action="{% url 'back' %}" method="GET" style="display:inline;">
@@ -172,7 +178,7 @@
 
         <div> 
             {% for forum in forums %}
-            <h3>{{ forum.id }} -- <a href="{% url 'forumpage' forum.id %}">{{ forum.name }}</a></h3>
+            <h3><a href="{% url 'forumpage' forum.id %}">{{ forum.name }}</a></h3>
             <h5><b>{{ forum.topic }}</b></h5>
             <h5>Hosted By @{{ forum.host }}</h5>
             {% if request.user == forum.host %}

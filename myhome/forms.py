@@ -1,5 +1,11 @@
 from django.forms import ModelForm
-from .models import Forums, Product, Order, Courses
+from .models import Forums, Product, Order, Courses, Topic, Contactus
+from django import forms
+
+class ContactForm(ModelForm):
+    class Meta:
+        model = Contactus
+        fields = '__all__'
 
 class ForumForm(ModelForm):
     class Meta:
@@ -21,4 +27,11 @@ class OrderForm(ModelForm):
 class AddcourseForm(ModelForm):
     class Meta:
         model = Courses
+        fields = '__all__'
+
+class TopicForm(ModelForm):
+    delete = forms.BooleanField(required=False, label="Delete this topic")
+
+    class Meta:
+        model = Topic
         fields = '__all__'

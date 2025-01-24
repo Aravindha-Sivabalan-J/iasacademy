@@ -10,7 +10,7 @@ from .models import Courses, Product
 from .models import Contactus
 from .models import Forums
 from .models import Topic, Message, Cart, Order, CartItem, OrderItem
-from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm
+from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm, TopicForm, ContactForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -77,7 +77,6 @@ def coursehome(request):
     context={'coursehome':coursehome}
     return render(request,'coursehome.html', context)
 
-
 def contacthome(request):
     contacthome=Contactus.objects.all()
     context={'contacthome':contacthome}
@@ -112,6 +111,26 @@ def is_superuser_or_staff(user):
     return user.is_superuser or user.is_staff
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
+def topicadd(request):
+    addtopicform = TopicForm()
+    if request.method == 'POST':
+        addtopicform = TopicForm(request.POST)
+        if addtopicform.is_valid():
+            if addtopicform.cleaned_data.get('delete'):  
+                topic_name = addtopicform.cleaned_data.get('name')  
+                topic = Topic.objects.filter(name=topic_name).first()
+                if topic:
+                    topic.delete()
+                    return redirect('forums')
+                else:
+                    addtopicform.add_error('name', 'Topic not found for deletion')
+            else:
+                topic = addtopicform.save(commit=True)
+                return redirect('forums')
+    context = {'addtopicform': addtopicform}
+    return render(request, 'addtopic.html', context)
+
+@user_passes_test(is_superuser_or_staff, login_url='login')
 def add_product(request):
     bookform = ProductForm()
     if request.method == 'POST':
@@ -122,6 +141,27 @@ def add_product(request):
             return redirect ('materials')
     context={'bookform':bookform}
     return render (request,'bookform.html', context)
+
+@user_passes_test(is_superuser_or_staff, login_url='login')
+def add_contact(request):
+    addcontactform = ContactForm()
+    if request.method == 'POST':
+        addcontactform = ContactForm(request.POST)
+        contactus = addcontactform.save(commit = 'TRUE')
+        contactus.save()
+        return redirect('contacthome')
+    context = {'addcontactform':addcontactform}
+    return render (request, 'contactform.html', context)
+
+@user_passes_test(is_superuser_or_staff, login_url='login')
+def delcontact(request, pk):
+    contaact = Contactus.objects.get(id=pk)
+    if request.method == 'POST':
+        contaact.delete()
+        return redirect ('contacthome')
+    context = {'obj': contaact}
+    return render (request, 'delete.html', context)
+
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
 def add_course(request):
@@ -135,6 +175,14 @@ def add_course(request):
     context={'courseform':courseform}
     return render (request, 'courseform.html', context)
 
+@user_passes_test(is_superuser_or_staff, login_url='login')
+def delcourse(request, pk):
+    coursee = Courses.objects.get(id=pk)
+    if request.method == 'POST':
+        coursee.delete()
+        return redirect ('home')
+    context = {'obj': coursee}
+    return render (request, 'delete.html', context)
 
 def bookpage(request, product_id):
     try:
@@ -186,16 +234,25 @@ def userprofile(request):
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
 def createforum(request):
-    form=ForumForm()
-    if request.method=='POST':
-        form=ForumForm(request.POST)
+    form = ForumForm()
+    if request.method == 'POST':
+        form = ForumForm(request.POST)
         if form.is_valid():
-            forum = form.save(commit='FALSE')
-            forum.host=request.user
-            forum.save()
-            return redirect('forums')
-    context={'form':form}
-    return render (request,'room_form.html', context)
+            forum_to_delete = form.cleaned_data.get('delete_forum')
+            if forum_to_delete:
+                forum_to_delete.delete()  
+                return redirect('forums') 
+            else:
+                forum = form.save(commit=False)
+                forum.host = request.user
+                forum.save()
+                return redirect('forums')
+    context = {'form': form}
+    return render(request, 'room_form.html', context)
+
+
+    return render(request, 'delete_forum.html', context)
+
 
 @login_required(login_url='login')
 def updateforum(request,pk):

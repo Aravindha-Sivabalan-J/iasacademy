@@ -87,6 +87,12 @@
 <h3><u>COURSE COST</u></h3>
 <P>The {{ course.subject }} course is now available at Rs.{{ course.price }}/-</P>
 
+<a href = "{% url 'delrooms' course.id %}">
+    <button>
+        DELETE COURSE
+    </button>
+</a>
+
 {% endblock %}
 </body>
 </html>

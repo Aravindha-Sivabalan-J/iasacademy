@@ -33,8 +33,10 @@
     {% block content %}
 
     {% include 'contactnavbar.html' with contactus=contactus %}
-    
 
+
+    <div style="height: 570px;">
+        <a href = "{% url 'delcontact' contact.id %}">DELETE CONTACT</a>
         <h3>Feel free to walkin or contact us at your nearest branches!<br>Kickstart your competitive exam journey!</h3>
 
         <h3><b>BRANCH NAME:</b><i>{{ contact.branch_name }}</i></h3>
@@ -47,11 +49,13 @@
         <h3><b>CONTACT NUMBER:</b></h3>
         <h4><b>WHATSAPP:</b></h4> <h4>{{ contact.contact_no }}</h4>
         <h4><b>LANDLINE:</b></h4> <h4>{{ contact.landline_contact }}</h4>
+
+        
        
 
 
     
-    
+    </div>
         </body>
         <footer>
             <marquee behavior="scroll"><p> Follow us on social media to stay updated about course details and new batch announcements</p></marquee>
