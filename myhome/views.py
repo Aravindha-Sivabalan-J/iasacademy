@@ -18,24 +18,28 @@ from django.shortcuts import get_object_or_404
 # Create your views here.
 
 def loginpage(request):
-    page='login'
+    page = 'login'
     if request.user.is_authenticated:
         return redirect('home')
-    if request.method=='POST':
-        username=request.POST.get('username').lower()
-        password=request.POST.get('password')
-        # try:
-        #     user=user.object.get(username=username)
-        # except:
-        #     messages.error(request, 'User does not exist')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username').lower()
+        password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
+        if username and password:
+            if User.objects.filter(username=username).exists():
+                # Authenticate the user with the provided password
+                user = authenticate(request, username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Invalid Password')  # Password does not match
+            else:
+                messages.error(request, 'Invalid Username')  # Username does not exist
         else:
-            messages.error(request, 'User does not Exist')
-    context={'page':page}
+            messages.error(request, 'Both Fields are required')
+    context = {'page': page}
     return render(request, 'login_register.html', context)
 
 def logoutuser(request):
@@ -155,12 +159,12 @@ def add_contact(request):
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
 def delcontact(request, pk):
-    contaact = Contactus.objects.get(id=pk)
+    contaact = Conactus.objects.get(id=pk)
     if request.method == 'POST':
         contaact.delete()
         return redirect ('contacthome')
     context = {'obj': contaact}
-    return render (request, 'delete.html', context)
+    return render (request, 'delete.html',context)
 
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
