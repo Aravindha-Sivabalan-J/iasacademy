@@ -148,10 +148,90 @@
                 transform: translateX(-100%);
             }
         }
-        .galcont{
-            width: auto;
-            margin-left: 0%;
-            margin-right: 0%;
+        .scroll-container {
+        overflow: hidden;
+        position: relative;
+        white-space: nowrap;
+        width: 100%;
+        }
+
+        .scroll-content {
+            display: flex;
+            gap: 10px; /* Optional: spacing between images */
+            animation: scroll 20s linear infinite;
+        }
+
+        .scroll-content img {
+            flex-shrink: 0;
+        }
+
+        @keyframes scroll {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* To make the animation seamless, duplicate the content */
+        .scroll-content:after {
+            content: "";
+            display: inline-block;
+            width: 100%;
+        }
+
+        form {
+        background-color: #ffffff;
+        max-width: auto;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form p {
+            margin-bottom: 15px;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #1b5e20;
+        }
+
+        .formdiv{
+            background-color: #2e7d32;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            text-align: center;
+            color: #f9f9f9;
         }
         
     </style>
@@ -172,6 +252,7 @@
             <li><b><a href="{% url 'forums' %}">FORUM</a></b></li>
             <li><b><a href="{% url 'materials' %}">STUDY MATERIALS</a></b></li>
             {% if request.user.is_authenticated %}
+            <li><a href="{% url 'profile' request.user.id %}"><b>PROFILE</b></a></li>
             <li><b><a href="{% url 'logout' %}">LOGOUT</a></b></li>
             {% else %}
             <li><b><a href="{% url 'login' %}">LOGIN / SIGNUP</a></b></li>
@@ -190,6 +271,18 @@
 <h3>Our Journey of Excellence: Transforming Aspirations into Achievements</h3>
 
 <p>Over the past five years, our academy has been a guiding light for countless aspirants, helping them transform their dreams into reality. Our journey has been defined by relentless dedication, innovative teaching methods, and an unyielding commitment to student success. Here’s a closer look at our remarkable achievements:</p>
+
+<div class="formdiv">
+<h3>SUBMIT AN ENQUIRY TO RECEIVE A CALLBACK !!</h3>
+</div>
+<div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ enquireform.as_p }}
+        <input type="submit" value="SUBMIT"/>
+    </form>
+</div>
+
 
 <h3>Inspiring Success Stories</h3>
 
@@ -217,11 +310,11 @@
 
     <br>
     <div class="galcont">
-        <div class="gallery" style="background-color: #388e3c; padding-top: 10px; padding-bottom: 10px;">
+        <div class="gallery" style="padding-top: 10px; padding-bottom: 10px;">
             <h2 style="text-align: center;">GALLERY</h2>
         </div>
         <div class="scroll-container">
-            <marquee behavior="scroll" direction="scroll-left" scrollamount="10">
+            <div class="scroll-content">
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/classimg.jpg' %}">
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/classsimg.jpg' %}">
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/classssimg.jpg' %}">
@@ -230,23 +323,38 @@
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/libimg.jpg' %}">
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/libbimg.jpg' %}">
                 <img  style="height: 400px; width: 400px;" src="{% static 'images/libbbimg.jpg' %}">
-            </marquee>       
+            </div>      
         </div>
     </div>
-
-
-    <div class="coursediv">
+    <br>
+    <br>
+    <div style="text-align: center; padding-bottom: 5px;">
+        <h1 style="color: #2e7d32;">COURSES</h1>
+    </div>
+    <div>
+        <nav class="navbar">
+            <ul>
+                {% for course in courses %}
+    
+                <a href = "{% url 'rooms' course.id %}"><li>{{ course.subject }}</li></a>
+    
+                {% endfor %}
+              </ul>
+        </nav>
+    </div>
+    
+    <!-- <div class="coursediv">
         {% for course in courses %}
 
         <a href = "{% url 'rooms' course.id %}"><h2>{{ course.subject }}</h2></a>
 
         {% endfor %}
-    </div>
+    </div> -->
     <br>
 
 <p>What truly sets us apart is the bond we share with our students—a bond built on trust, guidance, and mutual respect. We are proud to have been a part of their journey, cheering them on through challenges and celebrating their victories.</p>
 
-<div class="gallery" style="background-color: #388e3c; padding-top: 10px; padding-bottom: 10px; margin-left: 0%; margin-right: 0%;">
+<div class="gallery" style="background-color: #388e3c;">
     <h2 style="text-align: center;">TESTIMONIALS</h2>
 </div>
     <div class="testimonial-container">
@@ -269,5 +377,5 @@
 <footer style="background-color: burlywood; color: brown;">
     <marquee class="martag" behavior="scroll">CONTACT DETAILS: 976543210/9876543211  ADDRESS:No-1, ABCD street, XYZ Avenue, Chennai - 600001 </marquee>
 </footer>
-{% endblock content %}
 </html>
+{% endblock content %}

@@ -108,7 +108,7 @@
             <h3>PRICE:</h3>
             <p>&#8377;.{{ product.price|floatformat:2 }}/-</p>
 
-            <a><button class="btncls" style="border-radius: 5px; padding: 10px;"><b>BUY NOW</b></button></a>
+            <a href="{% url 'add_to_cart' product.id %}"><button class="btncls" style="border-radius: 5px; padding: 10px;"><b>BUY NOW</b></button></a>
             <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary"><button class="btncls" style="border-radius: 5px; padding: 10px;">ADD TO CART</button></a>
             
         </div>

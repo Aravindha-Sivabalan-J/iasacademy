@@ -1,15 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+import datetime
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
 class Courses(models.Model):
     #we need course name, duration, fees, no of tests, start date, end date and study material
-    subject = models.TextField(max_length=100)
-    duration = models.CharField(max_length=100)
-    description = models.TextField(max_length=2500)
+    subject = models.TextField(max_length=25)
+    duration = models.CharField(max_length=20)
+    description = models.TextField(max_length=300)
     no_of_tests = models.IntegerField()
-    study_material = models.TextField(max_length=1000)
+    study_material = models.TextField(max_length=300)
     price = models.IntegerField()
 
     #this is a string representation 
@@ -89,7 +92,7 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)  # Prevent product deletion affecting orders
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)  # Prevent product deletion affecting orders
     quantity = models.PositiveIntegerField(default=1)
     
 
@@ -103,15 +106,14 @@ class Order(models.Model):
         ('UPI', 'UPI Apps'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    Address_line_1 = models.CharField(max_length=255)
-    Address_line_2 = models.CharField(max_length=255, blank='True', null='True')
-    Address_line_3 = models.CharField(max_length=255, blank='True', null='True')
+    Delivery_Address = models.CharField(max_length=255, blank='False', null='False')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    Zipcode = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
+    Zipcode = models.IntegerField(blank='False', null='False')
+    phone_number = models.IntegerField(blank='False', null='False')
     payment_method = models.CharField(choices=payment_method_options, max_length=50, default='COD')
     status = models.CharField(max_length=20, default='Pending')
-    items = models.ManyToManyField(CartItem, related_name="orders") 
+    items = models.ManyToManyField(CartItem, related_name="orders")
+    order_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -122,11 +124,75 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
+class Enquiry(models.Model):
+    how_do_you_know = [
+        ('friends', 'Friends'),
+        ('family', 'Family'),
+        ('newspaper', 'Newspaper'),
+        ('tv ads', 'TV Ads'),
+        ('posters', 'Posters'),
+        ('others', 'Others'),
+    ]
+    course_name = [
+        ('tnpsc', 'TNPSC'),
+        ('upsc', 'UPSC'),
+        ('tnusrb', 'TNUSRB'),
+        ('ssb', 'SSB'),
+        ('rrb', 'RRB'),
+        ('app', 'APP'),
+    ]
+    name = models.CharField(max_length=150)
+    age = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(21),MaxValueValidator(40)],
+        help_text="Age should be between 21 and 40."
+    )
+    educational_qualification=models.CharField(max_length=255, default='')
+    contact_number = models.CharField(max_length=10, help_text ="Enter a Valid Mobile Number")
+    address_of_residence = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=150, blank='False', null='False')
+    interested_course_Course = models.CharField(choices=course_name, max_length=255)
+    how_do_you_know_us = models.CharField(choices=how_do_you_know, max_length=255)
+    enquired=models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default='')
+    last_follow_up = models.DateTimeField(auto_now=True)
+    next_follow_up = models.DateField(default=datetime.date.today)
 
 
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
 
-
+    def __str__(self):
+        return self.name
+        
+class Timetable(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
     
+    course = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1)
+    day = models.CharField(max_length=10, choices=DAYS_OF_WEEK)
+    period_1 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_1_timetables')
+    period_2 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_2_timetables')
+    period_3 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_3_timetables')
+    period_4 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_4_timetables')
+    period_5 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_5_timetables')
+    period_6 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_6_timetables')
+    period_7 = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='period_7_timetables')
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    classroom = models.CharField(max_length=10, blank=True, null=True)
+
+class CourseEnrollment(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollments')
+    course = models.ForeignKey(Courses, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.subject}"
 
 
 

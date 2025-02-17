@@ -20,7 +20,7 @@ urlpatterns = [
     path('addmaterials/', views.add_product, name = "addmaterials"),
     path('bookpage/<int:product_id>/', views.bookpage, name="bookpage"),
     path('forums/', views.forums, name="forums"),
-    path('profile/<str:pk>', views.userprofile, name="userprofile"),
+    path('profile/<str:pk>', views.userprofile, name="profile"),
     path('forumpage/<str:pk>', views.Forumpage, name="forumpage"),
     path('addtopic/', views.topicadd, name = "addtopic"),
     path('createforum/', views.createforum, name="createforum"),
@@ -34,5 +34,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name="checkout"),
     path('back/', views.back_view, name='back'),
     path('aboutus/', views.aboutus, name="aboutus"),
+    path('admissions_home/', views.admission_details, name= 'admissions_home'),
+    path('store_home/', views.store_home, name='storehome'),
+    path('delmaterials/', views.delmaterials, name='delmaterials'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

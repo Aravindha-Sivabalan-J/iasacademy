@@ -63,6 +63,16 @@
         a:hover {
             color: #0056b3;
         }
+        .division {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #2e7d32; /* Deep green background */
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -87,11 +97,23 @@
 <h3><u>COURSE COST</u></h3>
 <P>The {{ course.subject }} course is now available at Rs.{{ course.price }}/-</P>
 
-<a href = "{% url 'delrooms' course.id %}">
-    <button>
-        DELETE COURSE
-    </button>
-</a>
+<div class="division">
+    {% if request.user.is_authenticated and request.user.is_superuser or request.user.groups.all.0.name == 'admissions' %}
+    <div>
+        <a href = "{% url 'delrooms' course.id %}">
+        <button>
+            DELETE COURSE
+        </button>
+        </a>
+    </div>
+    {% endif %}
+
+
+
+    <div>
+        <a href="{% url 'home' %}"><b style="color: #f4f4f9;">BACK</b></a>
+    </div>
+</div>
 
 {% endblock %}
 </body>

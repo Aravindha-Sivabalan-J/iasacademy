@@ -12,6 +12,10 @@ from .models import Order
 from .models import Cart
 from .models import CartItem
 from .models import OrderItem
+from .models import Enquiry
+from .models import Subject
+from .models import Timetable
+from .models import CourseEnrollment
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -27,6 +31,10 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('total_amount', 'items')
     inlines = [OrderItemInline]
 
+class EnquiryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'enquired')
+    readonly_fields = ('enquired',)
+
 
 admin.site.register(Courses)
 admin.site.register(Contactus)
@@ -38,4 +46,8 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(OrderItem)
+admin.site.register(Enquiry, EnquiryAdmin)
+admin.site.register(Subject)
+admin.site.register(Timetable)
+admin.site.register(CourseEnrollment)
 

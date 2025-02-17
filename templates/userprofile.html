@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #2980b9;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            background-color: #ecf0f1;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        td {
+            background-color: #ffffff;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .designation, .course-info {
+            margin-top: 20px;
+        }
+
+        .course-info p {
+            font-size: 1.1rem;
+            color: #34495e;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Hey {{ request.user.username }}!</h1>
+        <h3>
+            Designation -   {% for group in request.user.groups.all %}
+                            <b>{{ group.name }}</b>
+                            {% empty %}
+                            <b>No Group Assigned</b>
+                            {% endfor %}   
+        </h3>
+        <h3>
+            {% for enrollment in request.user.enrollments.all %}
+                <p>Course: {{ enrollment.course.subject }}</p>
+            {% endfor %}
+        </h3>
+
+        {% if is_student %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Period 1</th>
+                    <th>Period 2</th>
+                    <th>Period 3</th>
+                    <th>Period 4</th>
+                    <th>Period 5</th>
+                    <th>Period 6</th>
+                    <th>Period 7</th>
+                    <th>Teacher</th>
+                    <th>Classroom</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in timetable %}
+                    <tr>
+                        <td>{{ entry.day }}</td>
+                        <td>Period 1: {{ entry.period_1.name }}</td>
+                        <td>Period 2: {{ entry.period_2.name }}</td>
+                        <td>Period 3: {{ entry.period_3.name }}</td>
+                        <td>Period 4: {{ entry.period_4.name }}</td>
+                        <td>Period 5: {{ entry.period_5.name }}</td>
+                        <td>Period 6: {{ entry.period_6.name }}</td>
+                        <td>Period 7: {{ entry.period_7.name }}</td>
+                        <td>{{ entry.teacher }}</td>
+                        <td>{{ entry.classroom }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endif %}
+
+        </table>
+    </main>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+                

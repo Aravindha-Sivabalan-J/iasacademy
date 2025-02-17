@@ -144,7 +144,7 @@
         </form>
 
         {% if request.user.is_authenticated and request.user.is_superuser %}
-        <a href="{% url 'addmaterials' %}">ADD A BOOK</a>
+        <a href="{% url 'addmaterials' %}"><b style="color: white;">ADD A BOOK</b></a>
         {% endif %}
 
         <a href="{% url 'cart' %}">

@@ -5,25 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum home</title>
     <style>
-        .forum_container {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 20px; /* optional: to add space between the columns */
-            padding: 20px; /* optional: for spacing around the grid */
-        }
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    }
 
-        .forum_content {
-            grid-column: 1; /* This ensures the main content goes into the 3fr section */
-        }
+    .forum_container {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+    }
 
-        .participants {
-            grid-column: 2; /* This ensures the participants section goes into the 1fr section */
-        }
+    /* Forum Content Section */
+    .forum_content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        .forum_content div,
-        .participants div {
-            margin-bottom: 20px; /* optional: space between content sections */
-        }
+    h1, h3, h5 {
+        margin-bottom: 10px;
+    }
+
+    /* Back Button */
+    .back-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: #45a049;
+    }
+
+    /* Messages Section */
+    .forum_messages {
+        max-height: 400px; /* Limits message container height */
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .forum_messages small {
+        color: #666;
+    }
+
+    .forum_messages p {
+        background: #e8e8e8;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 5px 0;
+    }
+
+    /* Delete Link */
+    .forum_messages a {
+        color: red;
+        text-decoration: none;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+
+    .forum_messages a:hover {
+        text-decoration: underline;
+    }
+
+    /* Message Input Box (Fixed at Bottom) */
+    .message-box-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 10px;
+        box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .message-box-container input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Participants Section */
+    .participants {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .participants div {
+        background: #e8e8e8;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        text-align: center;
+    }
+
     </style>
 </head>
 <body>
@@ -44,6 +133,7 @@
 
                 {% for message in forum_messages %}
                     {% if request.user == message.user %}
+                    <a href="{% url 'profile' request.user.id %}">{{ request.user }}</a>
                     <a href="{% url 'delmessages' message.id  %}">DELETE</a>  
                     {% endif %}            
                     <small>@{{ message.user }}   {{ message.created|timesince }}</small>
@@ -53,10 +143,12 @@
             </div>
 
             {% if request.user.is_authenticated %}
-            <form method="POST" action="">
-                {% csrf_token %}
-                <input type="text" name="body" placeholder="Type your message here...."/>
-            </form>
+            <div class="message-box-container">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="text" name="body" placeholder="Type your message here...." required/>
+                </form>
+            </div>
             {% endif %}
         </div>
 

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+    
+        h3 {
+            color: #333;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+    
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    
+        th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+    
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    
+        /* Form Styling */
+        form {
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        input[type="submit"] {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+    
+        input[type="submit"]:hover {
+            background: #0056b3;
+        }
+    
+        /* Logout Button */
+        button {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+    
+        button:hover {
+            background-color: #a71d2a;
+        }
+    
+        /* Course List */
+        .navbarmegaa {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .navbarmegaa a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+    
+        .navbarmegaa a:hover {
+            text-decoration: underline;
+        }
+    </style>
+      
+{% extends 'main.html' %}
+{% block content %}
+
+<script>
+    // Prevent navigating back to the previous page
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+</script>
+
+<p>Welcome, {{ request.user.username }}!</p>
+<li><a href="{% url 'profile' request.user.id %}"><b>PROFILE</b></a></li>
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+<form method="GET" action="{% url 'admissions_home' %}" class="filter-form">
+    <label for="age">Age:</label>
+    <input type="number" name="age" id="age" min="21" max="40" placeholder="Enter Age">
+
+    <label for="course">Course:</label>
+    <select name="course" id="course">
+        <option value="">-- Select Course --</option>
+        {% for course in coursehome %}
+        <option value="{{ course.subject|lower }}">{{ course.subject }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="next_follow_up">Follow-Up Date:</label>
+    <input type="date" name="next_follow_up" id="next_follow_up">
+
+    <button type="submit">Filter</button>
+</form>
+
+<h3>ENQUIRY DETAILS</h3>
+
+<table border="1px">
+    <tr>
+        <th>ID</th>
+        <th>NAME</th>
+        <th>AGE</th>
+        <th>EDUCATIONAL QUALIFICATION</th>
+        <th>CONTACT NUMBER</th>
+        <th>ADDRESS_OF_RESIDENCE</th>
+        <th>PINCODE</th>
+        <th>INTERESTED COURSE</th>
+        <th>ENQUIRED ON</th>
+        <th>ENQUIRY STATUS</th>
+        <th>LAST FOLLOW UP</th>
+        <th>NEXT FOLLOW UP</th>   
+    </tr>
+    {% for detail in details %}
+    <tr>
+        <td>{{ detail.id }}</td>
+        <td>{{ detail.name }}</td>
+        <td>{{ detail.age }}</td>
+        <td>{{ detail.educational_qualification }}</td>
+        <td>{{ detail.contact_number }}</td>
+        <td>{{ detail.address_of_residence }}</td>
+        <td>{{ detail.pincode }}</td>
+        <td>{{ detail.interested_course_Course }}</td>
+        <td>{{ detail.enquired }}</td>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="enquiry_id" value="{{ detail.id }}">
+            <td>
+                <textarea name="status" rows="3" cols="40" placeholder="Enter feedback here...">{{ detail.status }}</textarea>
+            </td>
+            <td>{{ detail.last_follow_up|date:'Y-m-d H:i' }}</td>
+            <td><input type="date" name="next_follow_up" value="{{ detail.next_follow_up|date:'Y-m-d' }}"></td>
+            <td>
+                <input type="submit" name="enquiry_update" value="Update">
+            </td>
+        </form>
+        
+    </tr>
+    {% endfor %}
+
+</table>
+
+<h3>ADD A NEW COURSE</h3>
+
+<div>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ courseform.as_p }}
+        <input type="submit" value="SUBMIT"/>
+    </form>
+</div>
+
+<h3>AVAILABLE COURSES</h3>
+<ul>
+    {% for course in coursehome %}
+    <div class="navbarmegaa">
+    <a href = "{% url 'rooms' course.id %}"><h2>{{ course.subject }}</h2></a>
+    </div>
+    {% endfor %}
+</ul>
+  
+
+{% endblock content %}

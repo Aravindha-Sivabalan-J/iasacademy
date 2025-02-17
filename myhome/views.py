@@ -8,12 +8,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from .models import Courses, Product
 from .models import Contactus
-from .models import Forums
+from .models import Forums, Enquiry, Timetable, CourseEnrollment
 from .models import Topic, Message, Cart, Order, CartItem, OrderItem
-from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm, TopicForm, ContactForm
+from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm, TopicForm, ContactForm, EnquiryForm, EnquiryUpdateForm, ProductDeleteForm, OrderUpdateForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from .decorators import allowed_user
+from django.utils import timezone
 
 # Create your views here.
 
@@ -63,9 +65,20 @@ def registeruser(request):
 
 
 def home(request):
+    if request.user.groups.filter(name="admissions").exists():
+        return redirect('admissions_home')
+    elif request.user.groups.filter(name="storekeeper").exists():
+        return redirect('storehome')
     courses=Courses.objects.all()
     contactus=Contactus.objects.all()
-    context={'contactus':contactus,'courses':courses}
+    enquireform= EnquiryForm()
+    if request.method == 'POST':
+        enquireform = EnquiryForm(request.POST)
+        if enquireform.is_valid():
+            enquiry = enquireform.save(commit='True')
+            enquiry.save()
+            return redirect('home')
+    context={'contactus':contactus,'courses':courses, 'enquireform':enquireform}
     return render (request, 'home.html', context)
 
 def rooms(request,pk):
@@ -134,7 +147,7 @@ def topicadd(request):
     context = {'addtopicform': addtopicform}
     return render(request, 'addtopic.html', context)
 
-@user_passes_test(is_superuser_or_staff, login_url='login')
+
 def add_product(request):
     bookform = ProductForm()
     if request.method == 'POST':
@@ -167,7 +180,8 @@ def delcontact(request, pk):
     return render (request, 'delete.html',context)
 
 
-@user_passes_test(is_superuser_or_staff, login_url='login')
+# @user_passes_test(is_superuser_or_staff, login_url='login')
+@allowed_user(allowed_roles=['admissions'])
 def add_course(request):
     courseform = AddcourseForm()
     if request.method == 'POST':
@@ -179,7 +193,7 @@ def add_course(request):
     context={'courseform':courseform}
     return render (request, 'courseform.html', context)
 
-@user_passes_test(is_superuser_or_staff, login_url='login')
+
 def delcourse(request, pk):
     coursee = Courses.objects.get(id=pk)
     if request.method == 'POST':
@@ -195,6 +209,7 @@ def bookpage(request, product_id):
         raise Http404("Product not found")
     return render(request, 'bookpage.html', {'product': product})
 
+@allowed_user(allowed_roles=['faculty', 'students', 'superadmin'])
 def forums(request):
     q=request.GET.get('q') if request.GET.get('q') !=None else ''
     topics=Topic.objects.all()
@@ -214,6 +229,7 @@ def register(request):
         return redirect('home')
 
 @login_required(login_url='login')
+@allowed_user(allowed_roles=['faculty', 'students', 'superadmin'])
 def Forumpage(request,pk):
     forum=Forums.objects.get(id=pk)
     forum_messages=forum.message_set.all().order_by('-created')
@@ -231,9 +247,14 @@ def Forumpage(request,pk):
     return render (request, 'forumpage.html', context)
 
 
-def userprofile(request):
-    context={}
-    return render (request, 'profile.html, context')
+def userprofile(request, pk):
+    users = User.objects.get(id=pk)
+    is_student = request.user.groups.filter(name='student').exists()
+    enrolled_courses = CourseEnrollment.objects.filter(student=users).values_list('course', flat=True)
+    timetable = Timetable.objects.filter(course__in=enrolled_courses).order_by('day')
+
+    context={'users':users, 'is_student':is_student, 'timetable':timetable}
+    return render(request, 'userprofile.html', context)
 
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
@@ -422,3 +443,83 @@ def checkout(request):
         'total_price': total_price,
     })
 
+@allowed_user(allowed_roles=['admissions'])
+def admission_details(request):
+    details = Enquiry.objects.all()
+    admissionform = None 
+
+    age = request.GET.get('age')
+    course = request.GET.get('course')
+    next_follow_up = request.GET.get('next_follow_up')
+
+    if age:   
+        details = details.filter(age=age)
+
+    if course:
+        details = details.filter(interested_course_Course=course)
+
+    if next_follow_up:
+        details = details.filter(next_follow_up=next_follow_up)
+
+    
+    if request.method == "POST" and "enquiry_update" in request.POST:
+        enquiry_id = request.POST.get("enquiry_id")
+        enquiry = get_object_or_404(Enquiry, id=enquiry_id)
+        admissionform = EnquiryUpdateForm(request.POST, instance=enquiry)
+        if admissionform.is_valid():
+            enquiry = admissionform.save(commit=False)
+            enquiry.last_follow_up = timezone.now()
+            enquiry.save()
+            return redirect('admissions_home')
+
+    
+    courseform = AddcourseForm()
+    if request.method == "POST":
+        courseform = AddcourseForm(request.POST)
+        if courseform.is_valid():
+            courses=courseform.save()
+            courses.save()
+            return redirect('admissions_home') 
+    
+    coursehome=Courses.objects.all()
+
+    context = {
+        'details': details,
+        'admissionform': admissionform,
+        'courseform': courseform,
+        'coursehome':coursehome,
+    }
+    return render(request, 'details.html', context)
+
+def store_home(request):
+    orders = Order.objects.prefetch_related('orderitem_set__product').order_by('-id')
+    from django.shortcuts import render, redirect
+
+    orderz = Order.objects.all().order_by('-order_date')
+
+    # Handle form submission
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")  # Get the order ID from the form
+        order = Order.objects.get(id=order_id)  # Get the specific order
+        orderform = OrderUpdateForm(request.POST, instance=order)  # Bind form to the instance
+        
+        if orderform.is_valid():
+            order = orderform.save()  # Save the updated status
+            return redirect('storehome')  # Redirect to prevent duplicate submissions
+
+    # Create a form for each order, pre-filled with the current status
+    order_forms = {order.id: OrderUpdateForm(instance=order) for order in orders}
+    context={'orders':orders, 'order_forms': order_forms, 'orderz':orderz}
+    return render(request, 'storehome.html', context)
+
+def delmaterials(request):
+    if request.method == 'POST':
+        form = ProductDeleteForm(request.POST)
+        if form.is_valid():
+            selected_products = form.cleaned_data['products']
+            selected_products.delete()  # Delete selected products
+            return redirect('delmaterials')  # Redirect to product list page (change as needed)
+    else:
+        form = ProductDeleteForm()
+
+    return render(request, 'deleteproduct.html', {'form': form})
