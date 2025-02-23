@@ -2,10 +2,24 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 import datetime
+import myhome.signals
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import Group
 
 # Create your models here.
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    address = models.CharField(max_length=255, verbose_name="Address", blank=True, null=True)
+    phone_number = models.CharField(max_length=15, verbose_name="Phone Number", blank=True, null=True)
+    age = models.IntegerField(verbose_name="Age", blank=True, null=True)
+    education = models.CharField(max_length=255, verbose_name="Education", blank=True, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="User Role")
+    course = models.ForeignKey('Courses', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Selected Course")
+
+    def __str__(self):
+        return self.user.username
+        
 class Courses(models.Model):
     #we need course name, duration, fees, no of tests, start date, end date and study material
     subject = models.TextField(max_length=25)
@@ -17,7 +31,7 @@ class Courses(models.Model):
 
     #this is a string representation 
     def __str__(self):
-        return(f"ID:{self.id}: our coaching for {self.subject}, with a duration of {self.duration} has proven to be more effective. {self.description} along with {self.no_of_tests} is the best coaching that you can get today, join now at just ${self.price}")
+        return self.subject
 
 class Contactus(models.Model):
     #we need to provide our contact details of various branches and mobile number
@@ -194,5 +208,11 @@ class CourseEnrollment(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.course.subject}"
 
+class FacultyCourse(models.Model):
+    teacher = models.ForeignKey(User,on_delete=models.CASCADE, related_name='dept_staff')
+    course = models.ForeignKey(Courses, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.teacher.username} - {self.course.subject}"
 
 

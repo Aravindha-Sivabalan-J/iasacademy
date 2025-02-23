@@ -16,6 +16,8 @@ from .models import Enquiry
 from .models import Subject
 from .models import Timetable
 from .models import CourseEnrollment
+from .models import FacultyCourse
+from .models import UserProfile
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -50,4 +52,6 @@ admin.site.register(Enquiry, EnquiryAdmin)
 admin.site.register(Subject)
 admin.site.register(Timetable)
 admin.site.register(CourseEnrollment)
+admin.site.register(FacultyCourse)
+admin.site.register(UserProfile)
 

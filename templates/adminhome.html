@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+</head>
+<body>
+    <main>
+        {% extends "main.html" %}
+        {% block content %}
+        <script>
+            // Prevent navigating back to the previous page
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
+        </script>
+
+        <h2>Hey {{ user.username }}</h2>
+        <li><a href="{% url 'profile' request.user.id %}"><b>PROFILE</b></a></li>
+        <a href="{% url 'logout' %}">LOGOUT</a>
+        
+            <h2>Register</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ adminform.as_p }}
+                
+                <button type="submit">Register</button>
+            </form>
+
+            {% if adminform.errors %}
+                <div style="color: red;">
+                    <strong>Form Errors:</strong>
+                    <ul>
+                        {% for field, errors in adminform.errors.items %}
+                            <li>{{ field }}: {{ errors|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const groupField = document.getElementById("id_group");  // Group dropdown
+                    const courseField = document.getElementById("id_course").closest("p");  // Course field container
+            
+                    function toggleCourseField() {
+                        if (groupField.options[groupField.selectedIndex].text.toLowerCase() === "student") {
+                            courseField.style.display = "block";
+                        } else {
+                            courseField.style.display = "none";
+                            document.getElementById("id_course").value = "";  // Reset course selection
+                        }
+                    }
+            
+                    toggleCourseField(); // Run on page load to handle pre-selected values
+                    groupField.addEventListener("change", toggleCourseField);
+                });
+            </script>
+            
+        {% endblock %}
+    </main>
+</body>
+</html>

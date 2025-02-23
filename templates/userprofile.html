@@ -115,46 +115,81 @@
                             {% endfor %}   
         </h3>
         <h3>
-            {% for enrollment in request.user.enrollments.all %}
-                <p>Course: {{ enrollment.course.subject }}</p>
-            {% endfor %}
+            Course -    {% for enrollment in enrolled_courses %}
+                            <b>{{ enrollment.course.subject }}</b>
+                        {% endfor %}
         </h3>
 
-        {% if is_student %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Period 1</th>
-                    <th>Period 2</th>
-                    <th>Period 3</th>
-                    <th>Period 4</th>
-                    <th>Period 5</th>
-                    <th>Period 6</th>
-                    <th>Period 7</th>
-                    <th>Teacher</th>
-                    <th>Classroom</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in timetable %}
+        {% if value == 'is_student' %}
+            <table border="1">
+                <thead>
                     <tr>
-                        <td>{{ entry.day }}</td>
-                        <td>Period 1: {{ entry.period_1.name }}</td>
-                        <td>Period 2: {{ entry.period_2.name }}</td>
-                        <td>Period 3: {{ entry.period_3.name }}</td>
-                        <td>Period 4: {{ entry.period_4.name }}</td>
-                        <td>Period 5: {{ entry.period_5.name }}</td>
-                        <td>Period 6: {{ entry.period_6.name }}</td>
-                        <td>Period 7: {{ entry.period_7.name }}</td>
-                        <td>{{ entry.teacher }}</td>
-                        <td>{{ entry.classroom }}</td>
+                        <th>Day</th>
+                        <th>Period 1</th>
+                        <th>Period 2</th>
+                        <th>Period 3</th>
+                        <th>Period 4</th>
+                        <th>Period 5</th>
+                        <th>Period 6</th>
+                        <th>Period 7</th>
+                        <th>Teacher</th>
+                        <th>Classroom</th>
                     </tr>
-                {% endfor %}
-            </tbody>
+                </thead>
+                <tbody>
+                    {% for entry in timetable %}
+                        <tr>
+                            <td>{{ entry.day }}</td>
+                            <td>Period 1: {{ entry.period_1.name }}</td>
+                            <td>Period 2: {{ entry.period_2.name }}</td>
+                            <td>Period 3: {{ entry.period_3.name }}</td>
+                            <td>Period 4: {{ entry.period_4.name }}</td>
+                            <td>Period 5: {{ entry.period_5.name }}</td>
+                            <td>Period 6: {{ entry.period_6.name }}</td>
+                            <td>Period 7: {{ entry.period_7.name }}</td>
+                            <td>{{ entry.teacher }}</td>
+                            <td>{{ entry.classroom }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif value == 'is_faculty' %}
+            <table border="1">
+                <thead>
+                    {% for entry in timetables %}
+                        <tr>
+                            <th>Day</th>
+                            <th>Period 1</th>
+                            <th>Period 2</th>
+                            <th>Period 3</th>
+                            <th>Period 4</th>
+                            <th>Period 5</th>
+                            <th>Period 6</th>
+                            <th>Period 7</th>
+                            <th>Teacher</th>
+                            <th>Classroom</th>
+                        </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td>{{ entry.day }}</td>
+                            <td>Period 1: {{ entry.period_1.name }}</td>
+                            <td>Period 2: {{ entry.period_2.name }}</td>
+                            <td>Period 3: {{ entry.period_3.name }}</td>
+                            <td>Period 4: {{ entry.period_4.name }}</td>
+                            <td>Period 5: {{ entry.period_5.name }}</td>
+                            <td>Period 6: {{ entry.period_6.name }}</td>
+                            <td>Period 7: {{ entry.period_7.name }}</td>
+                            <td>{{ entry.teacher }}</td>
+                            <td>{{ entry.classroom }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
         {% endif %}
 
-        </table>
+        
     </main>
 </body>
 

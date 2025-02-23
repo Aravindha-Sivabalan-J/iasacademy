@@ -3,14 +3,14 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
-from .models import Courses, Product
+from .models import Courses, Product, UserProfile
 from .models import Contactus
-from .models import Forums, Enquiry, Timetable, CourseEnrollment
+from .models import Forums, Enquiry, Timetable, CourseEnrollment, FacultyCourse
 from .models import Topic, Message, Cart, Order, CartItem, OrderItem
-from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm, TopicForm, ContactForm, EnquiryForm, EnquiryUpdateForm, ProductDeleteForm, OrderUpdateForm
+from .forms import ForumForm, ProductForm, OrderForm, AddcourseForm, TopicForm, ContactForm, EnquiryForm, EnquiryUpdateForm, ProductDeleteForm, OrderUpdateForm, AdminForm
 from decimal import Decimal
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -69,6 +69,8 @@ def home(request):
         return redirect('admissions_home')
     elif request.user.groups.filter(name="storekeeper").exists():
         return redirect('storehome')
+    elif request.user.groups.filter(name="admin").exists():
+        return redirect('adminhome')
     courses=Courses.objects.all()
     contactus=Contactus.objects.all()
     enquireform= EnquiryForm()
@@ -249,12 +251,28 @@ def Forumpage(request,pk):
 
 def userprofile(request, pk):
     users = User.objects.get(id=pk)
-    is_student = request.user.groups.filter(name='student').exists()
+    value = ''
+    
+    if request.user.groups.filter(name='student').exists():
+        value = 'is_student'
+    elif request.user.groups.filter(name='faculty').exists():
+        value = 'is_faculty'
+
+    # Fetch the enrolled course IDs instead of CourseEnrollment objects
     enrolled_courses = CourseEnrollment.objects.filter(student=users).values_list('course', flat=True)
+
+    # Fetch the courses that the faculty teaches
+    course = FacultyCourse.objects.filter(teacher=users).values_list('course', flat=True)
+
+    # Fix: Ensure the correct filter for timetable
     timetable = Timetable.objects.filter(course__in=enrolled_courses).order_by('day')
 
-    context={'users':users, 'is_student':is_student, 'timetable':timetable}
+    timetables = Timetable.objects.all()
+
+    context = {'users': users, 'value': value, 'timetable': timetable, 'timetables': timetables, 'enrolled_courses': enrolled_courses}
+
     return render(request, 'userprofile.html', context)
+
 
 
 @user_passes_test(is_superuser_or_staff, login_url='login')
@@ -523,3 +541,14 @@ def delmaterials(request):
         form = ProductDeleteForm()
 
     return render(request, 'deleteproduct.html', {'form': form})
+
+def admin(request):
+    adminform=AdminForm()
+    if request.method == 'POST':
+        adminform=AdminForm(request.POST)
+        if adminform.is_valid():
+            adminform.save(commit=True)
+            return redirect ('adminhome')
+        else:
+            print(adminform.errors) 
+    return render(request, 'adminhome.html', {'adminform':adminform})

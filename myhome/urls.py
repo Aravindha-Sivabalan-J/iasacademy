@@ -37,5 +37,6 @@ urlpatterns = [
     path('admissions_home/', views.admission_details, name= 'admissions_home'),
     path('store_home/', views.store_home, name='storehome'),
     path('delmaterials/', views.delmaterials, name='delmaterials'),
+    path('adminhome/', views.admin, name = 'adminhome'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
