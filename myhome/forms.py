@@ -1,5 +1,6 @@
 from django.forms import ModelForm
 from .models import Forums, Product, Order, Courses, Topic, Contactus, Enquiry, UserProfile
+from .models import CourseEnrollment
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
@@ -104,10 +105,13 @@ class AdminForm(UserCreationForm):
         profile.group = group  # ✅ Assign the group
 
         if group and group.name == "student":
-            profile.course = self.cleaned_data.get('course', None)
+            selected_course = self.cleaned_data.get('course', None)
+            profile.course = selected_course
+            
+            if selected_course:
+                CourseEnrollment.objects.get_or_create(student=user, course=selected_course)
         else:
             profile.course = None
-
         profile.save()
         return user
 

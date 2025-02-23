@@ -155,16 +155,17 @@
         <a href="{% url 'login' %}">LOGIN</a>
         {% endif %}
 
-        {% if request.user.is_authenticated and request.user.is_superuser %}
-        <a href="{% url 'addtopic' %}">ADD (or) DELETE A TOPIC</a>
+        {% if is_faculty_or_admin %}
+             <a href="{% url 'addtopic' %}">ADD (or) DELETE A TOPIC</a>
         {% endif %}
+
         
         <h4>{{ forum_count }} Active Forums</h4>
         <form method="GET" action="{% url 'forums' %}">
             <input type="text" name="q" placeholder="Search inside Rooms" />
         </form>
 
-        {% if request.user.is_authenticated and request.user.is_superuser %}
+        {% if is_faculty_or_admin %}
         
         <a href="{% url 'createforum' %}">CREATE ROOM</a>
         

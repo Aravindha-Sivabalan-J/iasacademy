@@ -114,11 +114,13 @@
                             <b>No Group Assigned</b>
                             {% endfor %}   
         </h3>
+        {% if value == 'is_student' %}
         <h3>
-            Course -    {% for enrollment in enrolled_courses %}
-                            <b>{{ enrollment.course.subject }}</b>
+            Course -    {% for course in enrolled_courses %}
+                            <b>{{ course.subject }}</b>
                         {% endfor %}
         </h3>
+        {% endif %}
 
         {% if value == 'is_student' %}
             <table border="1">

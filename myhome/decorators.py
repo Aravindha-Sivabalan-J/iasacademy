@@ -26,22 +26,25 @@ def unauthenticated_user(view_func):
 #         return wrapper_func
 #     return decorator
 
-
-def allowed_user(allowed_roles=[]):
+def allowed_user(*allowed_roles):  # ✅ Accept multiple roles as separate arguments
     def decorator(view_func):
         @wraps(view_func)
         def wrapper_func(request, *args, **kwargs):
             if request.user.groups.exists():
-                user_groups = set(group.name for group in request.user.groups.all())  # Get all group names
-                allowed_roles_set = set(allowed_roles)  # Convert allowed roles to a set for efficient lookup
-                
-                if user_groups & allowed_roles_set:  # Check if there is any common group
-                    return view_func(request, *args, **kwargs)  # Allow access
+                user_groups = {group.name for group in request.user.groups.all()}
+                print(f"🔍 Debugging Allowed User Decorator:")
+                print(f"👤 User: {request.user.username}")
+                print(f"👥 User Groups: {user_groups}")
+                print(f"✅ Allowed Roles: {allowed_roles}")
+                if user_groups.intersection(allowed_roles):  # ✅ Check if user has any allowed role
+                    return view_func(request, *args, **kwargs)  # ✅ Grant access
             
-            return HttpResponse('You are not authorized to view this page.', status=403)  # Forbidden response
+            return HttpResponse('You are not authorized to view this page.', status=403)  # ❌ Forbidden response
         
         return wrapper_func
     return decorator
+
+
 
 def admissions_only(view_func):
     def wrapper_func(request, *arges, **kwargs):

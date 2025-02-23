@@ -183,7 +183,7 @@ def delcontact(request, pk):
 
 
 # @user_passes_test(is_superuser_or_staff, login_url='login')
-@allowed_user(allowed_roles=['admissions'])
+@allowed_user('admissions')
 def add_course(request):
     courseform = AddcourseForm()
     if request.method == 'POST':
@@ -211,17 +211,28 @@ def bookpage(request, product_id):
         raise Http404("Product not found")
     return render(request, 'bookpage.html', {'product': product})
 
-@allowed_user(allowed_roles=['faculty', 'students', 'superadmin'])
+@allowed_user('student', 'superadmin', 'faculty')
 def forums(request):
     q=request.GET.get('q') if request.GET.get('q') !=None else ''
-    topics=Topic.objects.all()
-    forums=Forums.objects.filter(
-        Q(topic__name__icontains=q) |
-        Q(name__icontains=q)|
-        Q(forum_desc__icontains=q)
-    )
+    user = request.user
+    if user.groups.filter(name__in=['superadmin', 'faculty']).exists():
+        # Superadmin & Faculty can see ALL forums
+        forums = Forums.objects.filter(
+            Q(topic__name__icontains=q) | 
+            Q(name__icontains=q) | 
+            Q(forum_desc__icontains=q)
+        )
+        topics = Topic.objects.all()  # Show all topics
+    else:
+        enrolled_courses = CourseEnrollment.objects.filter(student=user).values_list('course__subject', flat=True)
+        topics = Topic.objects.filter(name__in=enrolled_courses)
+        forums=Forums.objects.filter(topic__name__in=enrolled_courses  # Ensure the forum's topic matches enrolled courses
+        ).filter(
+            Q(topic__name__icontains=q) | Q(name__icontains=q) | Q(forum_desc__icontains=q)
+        )
+    is_faculty_or_admin = user.groups.filter(name__in=['superadmin', 'faculty']).exists()
     forum_count=forums.count()
-    context={'forums':forums, 'topics':topics, 'forum_count':forum_count}
+    context={'forums':forums, 'topics':topics, 'forum_count':forum_count, 'is_faculty_or_admin':is_faculty_or_admin}
     return render (request, 'forum.html', context)
 
 def register(request):
@@ -230,8 +241,8 @@ def register(request):
         customer = Customer.objects.create(user=user)
         return redirect('home')
 
-@login_required(login_url='login')
-@allowed_user(allowed_roles=['faculty', 'students', 'superadmin'])
+
+@allowed_user('faculty','student','superadmin')
 def Forumpage(request,pk):
     forum=Forums.objects.get(id=pk)
     forum_messages=forum.message_set.all().order_by('-created')
@@ -259,7 +270,7 @@ def userprofile(request, pk):
         value = 'is_faculty'
 
     # Fetch the enrolled course IDs instead of CourseEnrollment objects
-    enrolled_courses = CourseEnrollment.objects.filter(student=users).values_list('course', flat=True)
+    enrolled_courses = Courses.objects.filter(id__in=CourseEnrollment.objects.filter(student=users).values_list('course', flat=True))
 
     # Fetch the courses that the faculty teaches
     course = FacultyCourse.objects.filter(teacher=users).values_list('course', flat=True)
@@ -275,7 +286,6 @@ def userprofile(request, pk):
 
 
 
-@user_passes_test(is_superuser_or_staff, login_url='login')
 def createforum(request):
     form = ForumForm()
     if request.method == 'POST':
@@ -461,7 +471,7 @@ def checkout(request):
         'total_price': total_price,
     })
 
-@allowed_user(allowed_roles=['admissions'])
+@allowed_user('admissions')
 def admission_details(request):
     details = Enquiry.objects.all()
     admissionform = None 
@@ -552,3 +562,16 @@ def admin(request):
         else:
             print(adminform.errors) 
     return render(request, 'adminhome.html', {'adminform':adminform})
+
+def forumview(request):
+    values = ''
+    if request.user.group.filter(name-'student').exists():
+        values = 'is_a_student'
+    elif request.user.group.filter(nam='faculty') or request.user.group.filter(nam='superuser'):
+        values = 'is_authorized'
+
+
+
+
+
+
