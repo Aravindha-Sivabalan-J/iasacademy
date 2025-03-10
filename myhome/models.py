@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User 
 from django.utils import timezone
 import datetime
 import myhome.signals
@@ -120,6 +120,7 @@ class Order(models.Model):
         ('UPI', 'UPI Apps'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    encrypted_username = models.TextField(blank=True, null=True)
     Delivery_Address = models.CharField(max_length=255, blank='False', null='False')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     Zipcode = models.IntegerField(blank='False', null='False')
@@ -137,6 +138,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    encrypted_product_name = models.TextField(blank=True, null=True)
 
 class Enquiry(models.Model):
     how_do_you_know = [

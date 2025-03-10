@@ -16,8 +16,19 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from .decorators import allowed_user
 from django.utils import timezone
+from cryptography.fernet import Fernet
+from django.conf import settings
 
 # Create your views here.
+
+f = Fernet(settings.ENCRYPT_KEY)
+
+def encrypt_data(data):
+    return f.encrypt(data.encode()).decode()
+
+def decrypt_data(data):
+    return f.decrypt(data.encode()).decode()
+
 
 def loginpage(request):
     page = 'login'
@@ -248,12 +259,25 @@ def Forumpage(request,pk):
     forum_messages=forum.message_set.all().order_by('-created')
     participants=forum.participants.all()
 
+    for message in forum_messages:
+        try:
+            message.body = f.decrypt(message.body.encode('utf-8')).decode('utf-8')
+        except Exception as e:
+            message.body = "[ERROR: Unable to decrypt]"
+
     if request.method == 'POST':
+        #encrypt message
+        message_original =request.POST.get('body')
+        message_bytes = message_original.encode('utf-8')
+        message_encrypted = f.encrypt(message_bytes)
+        message_decoded = message_encrypted.decode('utf-8')
+
         message = Message.objects.create(
             user=request.user,
             forums=forum,
-            body=request.POST.get('body')
+            body = message_decoded
         )
+         
         forum.participants.add(request.user)
         return redirect ('forumpage', pk=forum.id)
     context={'forum':forum, 'forum_messages':forum_messages, 'participants':participants}
@@ -441,17 +465,26 @@ def checkout(request):
             # Capture shipping information and other details from the form
             order = checkoutform.save(commit=False)
             order.user = request.user
+            
             order.total_amount = total_price
             order.status = 'Pending'  # You can set the order status to "Pending"
+            order.encrypted_username = encrypt_data(request.user.username)
+            order.Delivery_Address = encrypt_data(order.Delivery_Address)
+            order.payment_method = encrypt_data(order.payment_method)
+            
+            
+            
             order.save()
 
             # Create OrderItem instances for each CartItem
             for cart_item in cart_items:
+                
                 OrderItem.objects.create(
                     order=order,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
-                    price=cart_item.product.price
+                    price=cart_item.product.price,
+                    encrypted_product_name = encrypt_data(cart_item.product.name)
                 )
 
             # Clear the cart after placing the order
@@ -521,10 +554,25 @@ def admission_details(request):
 
 def store_home(request):
     orders = Order.objects.prefetch_related('orderitem_set__product').order_by('-id')
-    from django.shortcuts import render, redirect
-
+    for order in orders:
+        order.Delivery_Address = decrypt_data(order.Delivery_Address)
+        order.payment_method = decrypt_data(order.payment_method)
+        items = OrderItem.objects.filter(order=order)
+        decrypted_items = []
+        for item in items:
+            if item.encrypted_product_name is not None:
+                    try:
+                        item.encrypted_product_name = decrypt_data(item.encrypted_product_name)
+                    except Exception as e:
+                        print(f"Decryption failed for item {item.id}: {e}")
+                        item.encrypted_product_name = "Decryption Failed"  # Placeholder for failed decryption
+            else:
+                item.encrypted_product_name = "No Data"  # Placeholder for None values
+            
+            decrypted_items.append(item)
+        order.decrypted_items = decrypted_items    
     orderz = Order.objects.all().order_by('-order_date')
-
+ 
     # Handle form submission
     if request.method == "POST":
         order_id = request.POST.get("order_id")  # Get the order ID from the form

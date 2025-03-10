@@ -1,4 +1,5 @@
 from django.contrib import admin
+from myhome.views import decrypt_data
 
 # Register your models here.
 
@@ -22,16 +23,28 @@ from .models import UserProfile
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0 
-    readonly_fields = ('product', 'quantity', 'price')
+    readonly_fields = ('encrypted_product_name', 'quantity', 'price')
     show_change_link = False  # Remove the edit link for each OrderItem
     can_delete = False  # Remove the delete checkboxes
     max_num = 0
+    exclude = ['product']
 
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'total_amount', 'status')
-    readonly_fields = ('total_amount', 'items')
+    readonly_fields = ('encrypted_username', 'phone_number', 'Delivery_Address', 'total_amount', 'status', 'get_payment_method')
+    exclude = ['user', 'items', 'payment_method']
     inlines = [OrderItemInline]
+
+    def get_payment_method(self, obj):
+        return obj.payment_method
+    get_payment_method.short_description = "Payment Method"
+
+    # def get_payment_method(self, obj):
+    #     try:
+    #         return decrypt_data(obj.payment_method) if obj.payment_method else "N/A"
+    #     except:
+    #         return f"Error: {str(e)}"
 
 class EnquiryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'enquired')

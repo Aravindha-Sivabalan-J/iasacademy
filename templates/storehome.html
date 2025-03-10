@@ -142,6 +142,7 @@
             <th>Products Ordered</th>
             <th>Total Amount</th>
             <th>Delivery Address</th>
+            <th>Payment Method</th>
             <th>Order Date</th>
             <th>Status</th>
             
@@ -154,13 +155,14 @@
             <td style="padding: 10px;">{{ order.user.username }}</td>
             <td style="padding: 10px;">
                 <ul>
-                    {% for item in order.orderitem_set.all %}
-                        <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+                    {% for item in order.decrypted_items %}
+                        <li>{{ item.encrypted_product_name }} (x{{ item.quantity }})</li>
                     {% endfor %}
                 </ul>
             </td>
             <td style="padding: 10px;">{{ order.total_amount }}</td>
             <td style="padding: 10px;">{{ order.Delivery_Address  }}</td>
+            <td>{{ order.payment_method }}</td>
             <td>{{ order.order_date }}</td>
             <td style="padding: 10px;">
                 <form method="POST">
